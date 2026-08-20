@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>SOEP1 — Cursusmateriaal (JupyterLite)</title>
+<style>
+  :root {
+    --bg: #f7f7f5;
+    --card: #ffffff;
+    --border: #e3e1dc;
+    --text: #2b2a27;
+    --muted: #7a7870;
+    --accent: #af5b3f;
+    --accent-soft: #f3e6df;
+    --opgave: #3f6b52;
+    --opgave-soft: #e7f0ea;
+    --chip: #eee9e2;
+    --chip-text: #5a5750;
+    --lib: #3b5b7a;
+    --lib-soft: #e3ebf2;
+    --panel: #f0ede6;
+    --ok: #3f6b52;
+    --warn: #a3452f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1b19;
+      --card: #262523;
+      --border: #3a3834;
+      --text: #ece9e3;
+      --muted: #a19d94;
+      --accent: #e08a63;
+      --accent-soft: #3a2a22;
+      --opgave: #7fb894;
+      --opgave-soft: #22322a;
+      --chip: #33312d;
+      --chip-text: #c9c5bc;
+      --lib: #8fb5da;
+      --lib-soft: #22303d;
+      --panel: #232220;
+      --ok: #7fb894;
+      --warn: #e08a63;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", -apple-system, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.45;
+  }
+  header {
+    padding: 2rem 2rem 0.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  h1 { margin: 0 0 0.2rem; font-size: 1.6rem; }
+  .sub { color: var(--muted); font-size: 0.95rem; }
+
+  #lite-panel {
+    max-width: 1200px;
+    margin: 1.2rem auto 0;
+    padding: 0 2rem;
+  }
+  .panel-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+  }
+  .panel-box p { margin: 0.3rem 0; font-size: 0.88rem; }
+  .field-row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; margin-top: 0.6rem; }
+  .field-row label { font-size: 0.85rem; color: var(--muted); }
+  select, input[type=text] {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--card);
+    color: var(--text);
+    font-size: 0.88rem;
+  }
+  .hint { font-size: 0.8rem; color: var(--muted); }
+
+  #search {
+    width: 100%;
+    max-width: 1200px;
+    margin: 1.2rem auto 0;
+    display: block;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.95rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--text);
+  }
+  .tabs {
+    max-width: 1200px;
+    margin: 1.2rem auto 0;
+    padding: 0 2rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+  .tab {
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+  .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  main { max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
+  .deel { display: none; }
+  .deel.active { display: block; }
+  section.group { margin-bottom: 2.2rem; }
+  section.group h2 {
+    font-size: 1.05rem;
+    margin: 0 0 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+  }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 0.7rem; }
+
+  .card {
+    display: block;
+    padding: 0.75rem 0.9rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: border-color 0.15s, transform 0.1s;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .card .code {
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 0.82rem;
+  }
+  .card a.opentitle {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: block;
+    margin: 0.15rem 0 0.35rem;
+  }
+  .card a.opentitle:hover { text-decoration: underline; }
+  .card .subject {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 0.45rem;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+  .chip {
+    font-size: 0.72rem;
+    padding: 0.12rem 0.5rem;
+    border-radius: 999px;
+    background: var(--chip);
+    color: var(--chip-text);
+  }
+  .chip.lib { background: var(--lib-soft); color: var(--lib); }
+
+  .exercise {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.6rem;
+  }
+  .exercise .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .exercise .code { font-weight: 700; color: var(--accent); font-size: 0.82rem; }
+  .exercise .title { font-weight: 600; font-size: 0.98rem; }
+  .exercise .desc { font-size: 0.85rem; color: var(--muted); margin: 0.3rem 0 0.5rem; }
+  .exercise .covers { font-size: 0.8rem; margin-bottom: 0.5rem; }
+  .exercise .covers .label { color: var(--muted); margin-right: 0.3rem; }
+  .exercise .buttons { display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
+  .exercise a.opgave, .exercise a.oplossing {
+    text-decoration: none;
+    font-size: 0.82rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  a.opgave { background: var(--accent-soft); color: var(--accent); }
+  a.oplossing { background: var(--opgave-soft); color: var(--opgave); }
+  .no-oplossing { font-size: 0.78rem; color: var(--muted); font-style: italic; padding: 0.3rem 0; }
+
+  .hidden { display: none !important; }
+  footer { max-width: 1200px; margin: 0 auto; padding: 0 2rem 3rem; color: var(--muted); font-size: 0.8rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>SOEP1 — Cursusmateriaal (in de browser, geen installatie nodig)</h1>
+  <div class="sub">Volledige index van Deel 1, Deel 2 en Deel 3. Notebooks openen en draaien hier rechtstreeks in JupyterLite — je hoeft niets te installeren.</div>
+</header>
+
+<div id="lite-panel">
+  <div class="panel-box">
+    <p>🚀 Klik op een notebook hieronder om het meteen te openen en uit te voeren — alles draait in je browser via <a href="https://jupyterlite.readthedocs.io/" target="_blank" rel="noopener">JupyterLite</a>, er is geen server, Anaconda of VS Code nodig.</p>
+    <p class="hint">Eerste keer laden kan een paar seconden duren terwijl de Python-omgeving in je browser opstart. Je werk wordt lokaal in die browser bewaard (niet gedeeld tussen apparaten) — download een notebook via het bestandsmenu als je het wil bewaren.</p>
+    <div class="field-row">
+      <label for="flavorSelect">Interface</label>
+      <select id="flavorSelect">
+        <option value="lab">JupyterLab</option>
+        <option value="retro">Notebook (klassieke weergave)</option>
+      </select>
+      <details style="margin-left:0.5rem;">
+        <summary style="cursor:pointer; font-size:0.82rem; color:var(--muted); display:inline;">Geavanceerd</summary>
+        <div class="field-row" style="margin-top:0.5rem;">
+          <label for="baseUrlInput">Basis-URL (enkel nodig als deze pagina ergens anders staat dan de JupyterLite-site zelf)</label>
+          <input type="text" id="baseUrlInput" style="min-width:260px;" placeholder="leeg = relatief t.o.v. deze pagina">
+        </div>
+      </details>
+    </div>
+  </div>
+</div>
+
+<input id="search" type="text" placeholder="Zoek op onderwerp, bibliotheek, hoofdstuk of oefening (bv. 'recursie', 'pandas', 'dictionary')...">
+
+<div class="tabs">
+  <div class="tab active" data-target="deel1">Deel 1</div>
+  <div class="tab" data-target="deel2">Deel 2</div>
+  <div class="tab" data-target="deel3">Deel 3</div>
+</div>
+
+<main id="main"></main>
+
+<footer>
+  Gegenereerd op basis van de markdown-headers, imports en functiedefinities in elke notebook. "Dekt" bij oefeningen is een inhoudelijke inschatting op basis van gebruikte concepten, geen officiële leerplanmapping.<br>
+  Liever lokaal werken met je eigen Anaconda-installatie en VS Code? Gebruik dan <code>index.html</code> uit de cursusmap in plaats van deze pagina.
+</footer>
+
+<!-- Same precomputed TF-IDF search index as the local index.html — see build_search_index.py. -->
+<script src="search-index.js"></script>
+<script>
+/* ================= DATA ================= */
+/* Identical to index.html's DATA — keep both files in sync when notebooks change. */
+const DATA = {
+  1: {
+    topics: [
+      {code:"1.0", title:"Introductie", path:"Deel 1/1.0-Introductie.ipynb", subject:"IDEs (Jupyter, VS Code, Spyder), eerste programma, compilatie vs. interpretatie, dynamische typering", libs:[]},
+      {code:"1.1", title:"Basis data types", path:"Deel 1/1.1-basis_data_types.ipynb", subject:"Integers, floats, booleans, strings, dynamische typering, type-conversies", libs:[]},
+      {code:"1.2", title:"Variabelen", path:"Deel 1/1.2-variabelen.ipynb", subject:"Toewijzing, geheugenreferenties, wat gebeurt er achter de schermen bij a = b", libs:[]},
+      {code:"1.3", title:"Sets", path:"Deel 1/1.3-sets.ipynb", subject:"Verzamelingen, unieke elementen, add()-methode, verzamelingsoperaties", libs:[]},
+      {code:"1.4", title:"Lijsten", path:"Deel 1/1.4-lijsten.ipynb", subject:"Indexering, lijsten manipuleren, lijsten-in-lijsten, deep copy, tuples", libs:["copy"]},
+      {code:"1.5", title:"Dictionaries", path:"Deel 1/1.5-dictionaries.ipynb", subject:"Key-value paren, keys()/values()/items(), sorteren van dictionaries", libs:[]},
+      {code:"1.6", title:"Operatoren", path:"Deel 1/1.6-operatoren.ipynb", subject:"Rekenkundige, vergelijkende, logische en gelijkheidsoperatoren, volgorde van bewerkingen", libs:[]},
+      {code:"1.7", title:"Conditionals", path:"Deel 1/1.7-conditionals.ipynb", subject:"if/elif/else, indents, geneste if-statements, logische operatoren", libs:[]},
+      {code:"1.8", title:"Iteraties", path:"Deel 1/1.8-iteraties.ipynb", subject:"while-lussen, for-lussen, break en continue", libs:[]},
+      {code:"1.9", title:"Strings", path:"Deel 1/1.9-strings.ipynb", subject:"Stringmethodes, printen, input(), een groter voorbeeld", libs:[]},
+      {code:"1.10", title:"Functies", path:"Deel 1/1.10-functies.ipynb", subject:"Scope, deep copy, return-waarden, argumenten", libs:[]},
+      {code:"1.11", title:"Objecten", path:"Deel 1/1.11-objecten.ipynb", subject:"Classes, __init__, methodes, self, object-geörienteerd programmeren", libs:[]},
+      {code:"1.12", title:"Modules", path:"Deel 1/1.12-modules.ipynb", subject:"Externe modules importeren, dir(), selectief importeren", libs:["math","numpy","time"]},
+      {code:"1.13", title:"Errors / Debuggen", path:"Deel 1/1.13-errors.ipynb", subject:"10 veelvoorkomende foutmeldingen: Syntax, Indentation, ZeroDivision, Name, Value, Key, Index, Attribute, Type, Overflow", libs:["math"]},
+      {code:"1.X", title:"Extras", path:"Deel 1/1.X-Extras.ipynb", subject:"Extra voorbeeld met beeldverwerking", libs:["numpy","matplotlib","PIL"]},
+    ],
+    exercises: [
+      {code:"1a", title:"Korte oefeningen", opgave:"Deel 1/Oefeningen/1a.korte_oefeningen-opgave.ipynb", oplossing:"Deel 1/Oefeningen/1a.korte_oefeningen-oplossing.ipynb",
+       desc:"While/for-lus om een index te zoeken, lijst met stap 2 doorlopen, eigen eerste functie schrijven.", covers:["1.4 Lijsten","1.8 Iteraties","1.10 Functies"], libs:[]},
+      {code:"1b", title:"Oefeningen (13 vragen)", opgave:"Deel 1/Oefeningen/1b.oefeningen-opgave.ipynb", oplossing:"Deel 1/Oefeningen/1b.oefeningen-oplossing.ipynb",
+       desc:"O.a. samengestelde interest via for-loop, tellen/filteren in dictionaries, sorteren.", covers:["1.5 Dictionaries","1.8 Iteraties","1.12 Modules (NumPy)"], libs:["numpy"]},
+      {code:"1c", title:"Extra oefeningen — Morse code", opgave:"Deel 1/Oefeningen/1c.extra_oefeningen-opgave.ipynb", oplossing:"Deel 1/Oefeningen/1c.extra_oefeningen-oplossing.ipynb",
+       desc:"Omgekeerde Morse-dictionary bouwen, berichten versleutelen/decoderen, plus 3 extra oefeningen.", covers:["1.5 Dictionaries","1.9 Strings","1.4 Lijsten (tuples)"], libs:[]},
+      {code:"1d", title:"Oefeningen op fouten", opgave:"Deel 1/Oefeningen/1d.oefeningen_op_fouten-opgave.ipynb", oplossing:"Deel 1/Oefeningen/1d.oefeningen_op_fouten-oplossing.ipynb",
+       desc:"10 kapotte codefragmenten herstellen met minimale aanpassingen — test van syntax en foutherkenning.", covers:["1.13 Errors/Debuggen","2A.4 Comprehensions (voorbeeld)"], libs:[]},
+      {code:"1e", title:"Voorbeeld examenvragen", opgave:"Deel 1/Oefeningen/1e.voorbeeld_examenvragen-opgave.ipynb", oplossing:"Deel 1/Oefeningen/1e.voorbeeld_examenvragen-oplossing.ipynb",
+       desc:"Anagram-check, decimaal naar binair omzetten, aandelen rangschikken op gemiddelde prijs.", covers:["1.5 Dictionaries","1.9 Strings","1.10 Functies"], libs:["numpy"]},
+    ]
+  },
+  2: {
+    topics: [
+      {code:"2.0", title:"Introductie", path:"Deel 2/2.0-introductie.ipynb", subject:"Algoritme-strategieën: greedy (knapsack-voorbeeld), benaderingsalgoritmes, probabilistische/Monte Carlo-algoritmes", libs:["numpy"]},
+      {code:"2.0", title:"24-urenloop (project)", path:"Deel 2/2.0-24urenloop.ipynb", subject:"Monte Carlo-simulatie van een 24-uursestafette: rondetijden simuleren, races draaien, resultaten samenvatten en plotten", libs:["numpy","pandas","matplotlib","json","os","typing"]},
+      {code:"2A.1", title:"Zoekfuncties", path:"Deel 2/2A.1-zoekfuncties.ipynb", subject:"De laagste getallen in een lijst zoeken, omgaan met grensgevallen", libs:[]},
+      {code:"2A.2", title:"Bewijs van het tegendeel", path:"Deel 2/2A.2-bewijs_tegendeel.ipynb", subject:"Vroegtijdig stoppen: symmetrie van een matrix, gesorteerde rij, identieke rijen controleren", libs:[]},
+      {code:"2A.3", title:"Filter- en mapfuncties", path:"Deel 2/2A.3-filter_map_functies.ipynb", subject:"filter() en map() met eigen functies en lambda's", libs:[]},
+      {code:"2A.4", title:"Comprehensions", path:"Deel 2/2A.4-comprehensions.ipynb", subject:"Lijst-, set- en dictionary comprehensions", libs:[]},
+      {code:"2B.1", title:"Recursie", path:"Deel 2/2B.1-recursie.ipynb", subject:"Faculteit, maximum bepalen, rij van Fibonacci, Torens van Hanoi", libs:["time"]},
+      {code:"2B.2", title:"Backtracking", path:"Deel 2/2B.2-backtracking.ipynb", subject:"Recursieve backtracking: paardensprong (Knight's tour), Sudoku oplossen", libs:[]},
+      {code:"2C.1", title:"Sorteren", path:"Deel 2/2C.1-sorteren.ipynb", subject:"Bubble sort en merge sort (met pseudocode en implementatie)", libs:[]},
+      {code:"2C.2", title:"Complexiteit", path:"Deel 2/2C.2-complexiteit.ipynb", subject:"Big-O empirisch aangetoond door looptijden van bubble sort vs. merge sort te meten", libs:["numpy","matplotlib","time"]},
+    ],
+    exercises: [
+      {code:"2.A", title:"Korte oefeningen", opgave:"Deel 2/Oefeningen/2.A-korte_oefeningen_opgave.ipynb", oplossing:"Deel 2/Oefeningen/2.A-korte_oefeningen_oplossing.ipynb",
+       desc:"Hoogste getal + index vinden, comprehension met modulo-conditie.", covers:["2A.1 Zoekfuncties","2A.4 Comprehensions"], libs:[]},
+      {code:"2.A", title:"Oefeningen (7 voorbeelden)", opgave:"Deel 2/Oefeningen/2.A-oefeningen-opgave.ipynb", oplossing:"Deel 2/Oefeningen/2.A-oefeningen-oplossing.ipynb",
+       desc:"Gemeenschappelijke elementen tussen lijsten, ontbrekende getallen in een reeks, outliers, gemiddelde/standaardafwijking.", covers:["2A.1 Zoekfuncties","2A.2 Bewijs van het tegendeel"], libs:["numpy"]},
+      {code:"2.A/B1", title:"Voorbeeld examenvragen", opgave:"Deel 2/Oefeningen/2.A-B1-voorbeeld_examenvragen-opgave.ipynb", oplossing:"Deel 2/Oefeningen/2.A-B1-voorbeeld_examenvragen-oplossing.ipynb",
+       desc:"Rij met hoogste som (bewijs tegendeel), verdeel-en-heers op een matrix, recursief tellen met binaire zoekfunctie + dictionaries mergen.", covers:["2A.2 Bewijs van het tegendeel","2B.1 Recursie"], libs:[]},
+      {code:"2.B1", title:"Oefeningen", opgave:"Deel 2/Oefeningen/2.B1-oefeningen-opgave.ipynb", oplossing:"Deel 2/Oefeningen/2.B1-oefeningen-oplossing.ipynb",
+       desc:"Aftellen tot 0, som van een reeks via verdeel-en-heers, som van vierkante (sub)matrices — telkens met recursie.", covers:["2B.1 Recursie"], libs:[]},
+      {code:"2.B2", title:"Oefening 1 — Doolhof", opgave:"Deel 2/Oefeningen/2.B2-oefening1-opgave.ipynb", oplossing:"Deel 2/Oefeningen/2.B2-oefening1-oplossing.ipynb",
+       desc:"Recursief algoritme dat vanuit een startpositie een weg naar de rand van een doolhof zoekt.", covers:["2B.2 Backtracking"], libs:[]},
+      {code:"2.B2", title:"Oefening 2 — deel 1", opgave:"Deel 2/Oefeningen/2.B2-oefening2-deel1-opgave.ipynb", oplossing:"Deel 2/Oefeningen/2.B2-oefening2-deel1-oplossing.ipynb",
+       desc:"Bordoefening: zetten valideren (check_move) en mogelijke zetten zoeken (vind_moves) — eerste deel van een meerdelige backtracking-oefening.", covers:["2B.2 Backtracking"], libs:[]},
+      {code:"2.B2", title:"Oefening 2 — deel 2", opgave:"Deel 2/Oefeningen/2.B2-oefening2-deel2-opgave.ipynb", oplossing:"Deel 2/Oefeningen/2.B2-oefening2-deel2-oplossing.ipynb",
+       desc:"Vervolg op deel 1: uitbreiding van de recursieve zoekfunctie over het bord.", covers:["2B.2 Backtracking"], libs:[]},
+      {code:"2.B2", title:"Oefening 2 — deel 3", opgave:"Deel 2/Oefeningen/2.B2-oefening2-deel3-opgave.ipynb", oplossing:"Deel 2/Oefeningen/2.B2-oefening2-deel3-oplossing.ipynb",
+       desc:"Laatste deel: bord kopiëren (kopieer_bord) en volledige backtracking-oplossing afwerken.", covers:["2B.2 Backtracking"], libs:[]},
+      {code:"2.B2", title:"Oefening — deel 2 (losse variant)", opgave:"Deel 2/Oefeningen/2.B2-oefening-deel2-opgave.ipynb", oplossing:null,
+       desc:"Zelfde bordoefening als Oefening 2 — deel 2, lijkt een oudere/losse versie zonder bijhorende oplossing.", covers:["2B.2 Backtracking"], libs:[]},
+      {code:"2.B2", title:"Voorbeeld examenvraag — langste pad", opgave:"Deel 2/Oefeningen/2.B2-voorbeeld_examenvraag-opgave.ipynb", oplossing:"Deel 2/Oefeningen/2.B2-voorbeeld_examenvraag-oplossing.ipynb",
+       desc:"Recursief algoritme dat het langst mogelijke pad door een doolhof zoekt.", covers:["2B.2 Backtracking"], libs:["numpy"]},
+      {code:"2.C", title:"Oefeningen", opgave:"Deel 2/Oefeningen/2.C-oefeningen-opgave.ipynb", oplossing:"Deel 2/Oefeningen/2.C-oefeningen-oplossing.ipynb",
+       desc:"FCFS-planning (wacht-/doorlooptijd van processen), jump search; oplossing bevat ook grafenkleuring (backtracking).", covers:["2C.1 Sorteren","2A.1 Zoekfuncties","2B.2 Backtracking"], libs:[]},
+    ]
+  },
+  3: {
+    topics: [
+      {code:"3A", title:"Operationeel onderzoek", path:"Deel 3/3A-operationeel_onderzoek.ipynb", subject:"Kortste-pad algoritme (Dijkstra) en het knapzakprobleem, met graafvisualisatie", libs:["math","matplotlib","networkx"]},
+      {code:"3B.1", title:"NumPy", path:"Deel 3/3B.1-NumPy.ipynb", subject:"Arrays aanmaken, berekeningen, statistieken, matrixoperaties, hervormen/samenvoegen, sorteren, filteren", libs:["numpy"]},
+      {code:"3B.1", title:"Voorbeeld: intrestberekening", path:"Deel 3/3B.1-voorbeeld-intrestberekening.ipynb", subject:"Amortisatietabel van een lening opbouwen met een NumPy-matrix (maandbedrag, intrest, kapitaalaflossing)", libs:["numpy","matplotlib"]},
+      {code:"3B.1", title:"Voorbeeld: language model", path:"Deel 3/3B.1-voorbeeld_language_model.ipynb", subject:"Klein taalmodel op basis van de Transformer-architectuur, volledig in NumPy (tokenisatie, attention, softmax, training)", libs:["numpy"]},
+      {code:"3B.2", title:"Pandas", path:"Deel 3/3B.2-pandas.ipynb", subject:"Series en DataFrame, bestanden inlezen, kolommen, rijen doorlopen, filteren, sorteren/groeperen, data verwijderen", libs:["numpy","pandas"]},
+      {code:"3B.2", title:"Pandas — use cases", path:"Deel 3/3B.2-pandas_cases.ipynb", subject:"3 toegepaste cases, o.a. omgaan met ontbrekende (NaN) data via dropna()", libs:["numpy","pandas"]},
+      {code:"3C.1", title:"Supply chain management", path:"Deel 3/3C.1-supply_chain_management.ipynb", subject:"Voorraadbeheer over meerdere depots herverdelen (5 scenario's) en de EOQ-formule", libs:["numpy","matplotlib"]},
+      {code:"3C.2", title:"Marketing", path:"Deel 3/3C.2 - Marketing.ipynb", subject:"Klantengegevens simuleren, marketingacties toewijzen, Customer Lifetime Value berekenen, klanten filteren en visualiseren", libs:["numpy","pandas","matplotlib"]},
+      {code:"3C.3", title:"Finance", path:"Deel 3/3C.3 - Finance.ipynb", subject:"Beleggingsstrategie op AAPL-koersdata (tijdreeksen, uitsluitend ter illustratie)", libs:["numpy","pandas","matplotlib"]},
+      {code:"—", title:"Notebook les 10 (25/11 — Pandas)", path:"Deel 3/Notebook_les_10_25-11-Pandas.ipynb", subject:"Aanvullend lesnotebook met Pandas-codevoorbeelden (geen markdown-structuur)", libs:["numpy","pandas"]},
+      {code:"—", title:"Pandas prep", path:"Deel 3/Pandas prep.ipynb", subject:"Voorbereidend oefenmateriaal Pandas (geen markdown-structuur)", libs:["numpy","pandas"]},
+    ],
+    exercises: [
+      {code:"3B.1", title:"Oefeningen — deel 1 (Sudoku)", opgave:"Deel 3/Oefeningen/3B.1-oefeningen_deel_1-opgave.ipynb", oplossing:"Deel 3/Oefeningen/3B.1-oefeningen_deel_1-oplossing.ipynb",
+       desc:"7 vragen rond een 6x6 sudoku als NumPy-array (rijen/kolommen/blokken controleren).", covers:["3B.1 NumPy"], libs:["numpy"]},
+      {code:"3B.1", title:"Oefeningen — deel 2 (cijfers)", opgave:"Deel 3/Oefeningen/3B.1-oefeningen_deel_2-opgave.ipynb", oplossing:"Deel 3/Oefeningen/3B.1-oefeningen_deel_2-oplossing.ipynb",
+       desc:"5 vragen op een cijfermatrix van 10 studenten x 6 vakken (rijsommen, bonuspunten optellen).", covers:["3B.1 NumPy"], libs:["numpy"]},
+      {code:"3B.1", title:"Voorbeeld examenvragen", opgave:"Deel 3/Oefeningen/3B.1-voorbeeld_examenvragen-opgave.ipynb", oplossing:"Deel 3/Oefeningen/3B.1-voorbeeld_examenvragen-oplossing.ipynb",
+       desc:"Matrixeigenschappen controleren (vierkant + diagonaal) en een matrix met factor op de diagonaal opbouwen.", covers:["3B.1 NumPy"], libs:["numpy"]},
+      {code:"3B.2", title:"Oefeningen — deel 1 (verkeersongevallen)", opgave:"Deel 3/Oefeningen/3B.2-oefeningen_deel1-opgave.ipynb", oplossing:"Deel 3/Oefeningen/3B.2-oefeningen_deel1-oplossing.ipynb",
+       desc:"Open dataset verkeersongevallen 2020 (Statbel) inlezen en bevragen met Pandas.", covers:["3B.2 Pandas"], libs:["pandas"]},
+      {code:"3B.2", title:"Oefeningen — deel 2 (studenten)", opgave:"Deel 3/Oefeningen/3B.2-oefeningen_deel2-opgvave.ipynb", oplossing:"Deel 3/Oefeningen/3B.2-oefeningen_deel2-oplossing.ipynb",
+       desc:"Zelf een DataFrame met studentenpunten opbouwen en bevragen (bv. wie gebuisd is).", covers:["3B.2 Pandas"], libs:["numpy","pandas"]},
+      {code:"3B.2", title:"Voorbeeld examenvragen", opgave:"Deel 3/Oefeningen/3B.2-voorbeeld_examenvragen-opgave.ipynb", oplossing:"Deel 3/Oefeningen/3B.2-voorbeeld_examenvragen-oplossing.ipynb",
+       desc:"Rijen filteren op gemiddelde, hartpatiëntendataset bevragen, en een dataset over panda's (BMI-kolom met lambda/for-lus).", covers:["3B.2 Pandas","3B.2 Pandas — use cases"], libs:["numpy","pandas","random"]},
+    ]
+  }
+};
+
+/* ================= SETTINGS =================
+   No path, no token: JupyterLite serves the notebooks itself, so a link only
+   needs the JupyterLite interface (lab/retro) and, optionally, a base URL for
+   the rare case this page is hosted somewhere other than the JupyterLite site
+   itself (e.g. testing locally via `jupyter lite serve`). */
+const settings = {
+  flavor: localStorage.getItem('lite_flavor') || 'lab',
+  baseUrl: localStorage.getItem('lite_baseUrl') || '',
+};
+
+function saveSettings() {
+  localStorage.setItem('lite_flavor', settings.flavor);
+  localStorage.setItem('lite_baseUrl', settings.baseUrl);
+}
+
+function encodePath(relpath) {
+  return relpath.split('/').map(encodeURIComponent).join('/');
+}
+
+/* This page is meant to live at content/course.html in the JupyterLite source repo,
+   which JupyterLite serves as <site>/files/course.html — one level below the site
+   root, alongside /lab/ and /retro/. Hence the "../" default. If you host this page
+   somewhere else, set the base URL in "Geavanceerd" instead. */
+function buildHref(relpath) {
+  if (!relpath) return null;
+  const seg = settings.flavor === 'retro' ? 'retro/notebooks/index.html' : 'lab/index.html';
+  const base = settings.baseUrl.trim();
+  const prefix = base ? base.replace(/\/$/, '') + '/' : '../';
+  return prefix + seg + '?path=' + encodePath(relpath);
+}
+
+function refreshAllLinks() {
+  document.querySelectorAll('a[data-relpath]').forEach(a => {
+    a.href = buildHref(a.dataset.relpath);
+    a.target = '_blank';
+  });
+}
+
+/* ================= RENDER ================= */
+function libChips(libs) {
+  if (!libs || !libs.length) return '';
+  return `<div class="chips">${libs.map(l => `<span class="chip lib">${l}</span>`).join('')}</div>`;
+}
+
+function coversChips(covers) {
+  if (!covers || !covers.length) return '';
+  return `<div class="covers"><span class="label">Dekt:</span>${covers.map(c => `<span class="chip">${c}</span>`).join(' ')}</div>`;
+}
+
+function renderTopicCard(t) {
+  return `
+  <div class="card" data-searchpaths="${t.path}">
+    <span class="code">${t.code}</span>
+    <a class="opentitle" data-relpath="${t.path}" href="#">${t.title}</a>
+    <div class="subject">${t.subject}</div>
+    ${libChips(t.libs)}
+  </div>`;
+}
+
+function renderExercise(e) {
+  const buttons = `
+    <div class="buttons">
+      <a class="opgave" data-relpath="${e.opgave}" href="#">Opgave</a>
+      ${e.oplossing ? `<a class="oplossing" data-relpath="${e.oplossing}" href="#">Oplossing</a>` : `<span class="no-oplossing">geen oplossing beschikbaar</span>`}
+    </div>`;
+  const searchpaths = [e.opgave, e.oplossing].filter(Boolean).join(',');
+  return `
+  <div class="exercise" data-searchpaths="${searchpaths}">
+    <div class="top-row">
+      <span class="code">${e.code}</span>
+      <span class="title">${e.title}</span>
+    </div>
+    <div class="desc">${e.desc}</div>
+    ${coversChips(e.covers)}
+    ${libChips(e.libs)}
+    ${buttons}
+  </div>`;
+}
+
+function renderDeel(num) {
+  const d = DATA[num];
+  return `
+  <section class="group">
+    <h2>Cursusmateriaal</h2>
+    <div class="grid">${d.topics.map(renderTopicCard).join('')}</div>
+  </section>
+  <section class="group">
+    <h2>Oefeningen</h2>
+    ${d.exercises.map(renderExercise).join('')}
+  </section>`;
+}
+
+function renderAll() {
+  const main = document.getElementById('main');
+  main.innerHTML = [1,2,3].map(n => `<div class="deel${n===1?' active':''}" id="deel${n}">${renderDeel(n)}</div>`).join('');
+  refreshAllLinks();
+}
+
+/* ================= TABS ================= */
+function setupTabs() {
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.deel').forEach(d => d.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.target).classList.add('active');
+    });
+  });
+}
+
+/* ================= SEARCH (identical to index.html) ================= */
+function tokenizeQuery(q) {
+  return (q.toLowerCase().match(/[a-zà-ÿ0-9_]{3,}/gi) || []);
+}
+
+function tfidfScore(searchpaths, queryTerms) {
+  if (!searchpaths || typeof SEARCH_INDEX === 'undefined' || !queryTerms.length) return 0;
+  let score = 0;
+  searchpaths.split(',').forEach(rp => {
+    const doc = SEARCH_INDEX[rp];
+    if (!doc) return;
+    queryTerms.forEach(t => { if (doc[t]) score += doc[t]; });
+  });
+  return score;
+}
+
+function setupSearch() {
+  const search = document.getElementById('search');
+  const tabs = document.querySelectorAll('.tab');
+
+  const grids = Array.from(document.querySelectorAll('.grid'));
+  const originalCardOrder = grids.map(g => Array.from(g.children));
+  const exerciseSections = Array.from(document.querySelectorAll('section.group')).filter(s => s.querySelector('.exercise'));
+  const originalExerciseOrder = exerciseSections.map(s => Array.from(s.querySelectorAll('.exercise')));
+
+  function restoreOriginalOrder() {
+    grids.forEach((g, i) => originalCardOrder[i].forEach(el => g.appendChild(el)));
+    exerciseSections.forEach((s, i) => originalExerciseOrder[i].forEach(el => s.appendChild(el)));
+  }
+
+  function scoreOf(el, q, queryTerms) {
+    const textMatch = el.textContent.toLowerCase().includes(q);
+    const rel = tfidfScore(el.dataset.searchpaths, queryTerms);
+    return { match: textMatch || rel > 0, score: rel + (textMatch ? 50 : 0) };
+  }
+
+  function rankAndFilter(container, selector, q, queryTerms) {
+    const scored = Array.from(container.querySelectorAll(selector)).map(el => ({ el, ...scoreOf(el, q, queryTerms) }));
+    scored.forEach(({ el, match }) => el.classList.toggle('hidden', !match));
+    scored.sort((a, b) => b.score - a.score).forEach(({ el }) => container.appendChild(el));
+  }
+
+  search.addEventListener('input', () => {
+    const raw = search.value.trim();
+    const q = raw.toLowerCase();
+    const allDeels = document.querySelectorAll('.deel');
+
+    if (q === '') {
+      document.querySelectorAll('.card, .exercise, section.group').forEach(el => el.classList.remove('hidden'));
+      restoreOriginalOrder();
+      allDeels.forEach(d => d.classList.remove('active'));
+      tabs.forEach(t => t.classList.remove('active'));
+      tabs[0].classList.add('active');
+      allDeels[0].classList.add('active');
+      return;
+    }
+
+    allDeels.forEach(d => d.classList.add('active'));
+    const queryTerms = tokenizeQuery(q);
+
+    grids.forEach(g => rankAndFilter(g, '.card', q, queryTerms));
+    exerciseSections.forEach(s => rankAndFilter(s, '.exercise', q, queryTerms));
+
+    document.querySelectorAll('section.group').forEach(group => {
+      const visible = group.querySelectorAll('.card:not(.hidden), .exercise:not(.hidden)').length;
+      group.classList.toggle('hidden', visible === 0);
+    });
+  });
+}
+
+/* ================= INTERFACE PANEL ================= */
+function setupLitePanel() {
+  const flavorSelect = document.getElementById('flavorSelect');
+  const baseUrlInput = document.getElementById('baseUrlInput');
+
+  flavorSelect.value = settings.flavor;
+  baseUrlInput.value = settings.baseUrl;
+
+  flavorSelect.addEventListener('change', () => {
+    settings.flavor = flavorSelect.value;
+    saveSettings();
+    refreshAllLinks();
+  });
+  baseUrlInput.addEventListener('input', () => {
+    settings.baseUrl = baseUrlInput.value;
+    saveSettings();
+    refreshAllLinks();
+  });
+}
+
+renderAll();
+setupTabs();
+setupSearch();
+setupLitePanel();
+</script>
+
+</body>
+</html>
