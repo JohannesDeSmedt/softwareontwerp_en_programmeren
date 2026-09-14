@@ -25,6 +25,13 @@ jobs:
         run: |
           cp README.md content
           jupyter lite build --contents content --output-dir dist
+      - name: Use the course navigator as the site homepage
+        run: |
+          # `jupyter lite build` always writes its own generic placeholder to
+          # dist/index.html (the file mounted from content/ ends up at
+          # dist/files/index.html instead). Overwrite it so visitors landing
+          # on the site root see the course navigator, not the JupyterLite stub.
+          cp content/index.html dist/index.html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
