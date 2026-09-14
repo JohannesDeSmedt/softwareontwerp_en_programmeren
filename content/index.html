@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<title>SOEP1 — Cursusmateriaal</title>
+<title>SOEP1 — Cursusmateriaal (JupyterLite)</title>
 <style>
   :root {
     --bg: #f7f7f5;
@@ -19,8 +19,6 @@
     --lib: #3b5b7a;
     --lib-soft: #e3ebf2;
     --panel: #f0ede6;
-    --code-bg: #2b2a27;
-    --code-text: #f0ede6;
     --ok: #3f6b52;
     --warn: #a3452f;
   }
@@ -40,8 +38,6 @@
       --lib: #8fb5da;
       --lib-soft: #22303d;
       --panel: #232220;
-      --code-bg: #0f0e0d;
-      --code-text: #e8e5de;
       --ok: #7fb894;
       --warn: #e08a63;
     }
@@ -62,8 +58,7 @@
   h1 { margin: 0 0 0.2rem; font-size: 1.6rem; }
   .sub { color: var(--muted); font-size: 0.95rem; }
 
-  /* ---- Jupyter panel ---- */
-  #jupyter-panel {
+  #lite-panel {
     max-width: 1200px;
     margin: 1.2rem auto 0;
     padding: 0 2rem;
@@ -74,85 +69,16 @@
     border-radius: 12px;
     padding: 1rem 1.2rem;
   }
-  .panel-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    gap: 1rem;
-  }
-  .panel-head h3 {
-    margin: 0;
-    font-size: 1rem;
-  }
-  .panel-status {
-    font-size: 0.82rem;
-    padding: 0.2rem 0.6rem;
-    border-radius: 999px;
-    background: var(--chip);
-    color: var(--chip-text);
-    white-space: nowrap;
-  }
-  .panel-status.ok { background: var(--opgave-soft); color: var(--ok); }
-  .panel-status.warn { background: var(--accent-soft); color: var(--warn); }
-  .panel-body {
-    margin-top: 1rem;
-    display: grid;
-    gap: 0.9rem;
-  }
-  .panel-body.collapsed { display: none; }
-  .mode-row { display: flex; gap: 1.2rem; flex-wrap: wrap; font-size: 0.9rem; }
-  .mode-row label { display: flex; align-items: center; gap: 0.4rem; cursor: pointer; }
-  .field-row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; }
+  .panel-box p { margin: 0.3rem 0; font-size: 0.88rem; }
+  .field-row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; margin-top: 0.6rem; }
   .field-row label { font-size: 0.85rem; color: var(--muted); }
-  input[type=text], input[type=url] {
+  select, input[type=text] {
     padding: 0.4rem 0.6rem;
     border: 1px solid var(--border);
     border-radius: 6px;
     background: var(--card);
     color: var(--text);
     font-size: 0.88rem;
-  }
-  select {
-    padding: 0.4rem 0.6rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--card);
-    color: var(--text);
-    font-size: 0.88rem;
-  }
-  #baseUrlInput { min-width: 220px; }
-  #tokenInput { min-width: 160px; }
-  button.btn {
-    padding: 0.42rem 0.8rem;
-    border-radius: 6px;
-    border: 1px solid var(--accent);
-    background: var(--accent);
-    color: #fff;
-    font-size: 0.85rem;
-    cursor: pointer;
-  }
-  button.btn.secondary {
-    background: transparent;
-    color: var(--accent);
-  }
-  code.cmd {
-    display: block;
-    background: var(--code-bg);
-    color: var(--code-text);
-    padding: 0.6rem 0.8rem;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    overflow-x: auto;
-    white-space: pre;
-  }
-  .cmd-row { position: relative; }
-  .cmd-row button {
-    position: absolute;
-    top: 0.4rem;
-    right: 0.4rem;
-    font-size: 0.72rem;
-    padding: 0.2rem 0.5rem;
   }
   .hint { font-size: 0.8rem; color: var(--muted); }
 
@@ -268,7 +194,6 @@
   a.oplossing { background: var(--opgave-soft); color: var(--opgave); }
   .no-oplossing { font-size: 0.78rem; color: var(--muted); font-style: italic; padding: 0.3rem 0; }
 
-  a.needs-path, a.needs-token { opacity: 0.5; cursor: not-allowed; }
   .hidden { display: none !important; }
   .empty-msg { color: var(--muted); font-style: italic; padding: 1rem 0; }
   footer { max-width: 1200px; margin: 0 auto; padding: 0 2rem 3rem; color: var(--muted); font-size: 0.8rem; }
@@ -277,118 +202,27 @@
 <body>
 
 <header>
-  <h1>SOEP1 — Cursusmateriaal</h1>
-  <div class="sub">Volledige index van Deel 1, Deel 2 en Deel 3: onderwerpen, gebruikte concepten/bibliotheken en welke hoofdstukken elke oefening dekt.</div>
+  <h1>SOEP1 — Cursusmateriaal (in de browser, geen installatie nodig)</h1>
+  <div class="sub">Volledige index van Deel 1, Deel 2 en Deel 3. Notebooks openen en draaien hier rechtstreeks in JupyterLite — je hoeft niets te installeren.</div>
 </header>
 
-<div id="jupyter-panel">
+<div id="lite-panel">
   <div class="panel-box">
-    <div class="panel-head" id="panelToggle">
-      <h3>🚀 Notebooks openen via Jupyter</h3>
-      <span class="panel-status" id="panelStatus">VS Code-links</span>
-    </div>
-    <div class="panel-body" id="panelBody">
-      <div class="mode-row">
-        <label><input type="radio" name="mode" value="vscode" id="modeVscode" checked> Openen in VS Code (aanbevolen, geen server nodig)</label>
-        <label><input type="radio" name="mode" value="jupyter" id="modeJupyter"> Openen via draaiende Jupyter server</label>
-      </div>
-
-      <div id="pathFields" style="display:none;">
-        <div class="field-row">
-          <label for="rootPathInput">Volledig pad naar deze map op jouw computer</label>
-          <input type="text" id="rootPathInput" style="min-width:420px; flex:1;" placeholder="bv. /Users/naam/.../SOEP1  of  C:\Users\naam\...\SOEP1">
-          <button class="btn secondary" id="resetPathBtn" type="button" style="display:none;">↺ Automatisch pad herstellen</button>
+    <p>🚀 Klik op een notebook hieronder om het meteen te openen en uit te voeren — alles draait in je browser via <a href="https://jupyterlite.readthedocs.io/" target="_blank" rel="noopener">JupyterLite</a>, er is geen server, Anaconda of VS Code nodig.</p>
+    <p class="hint">Eerste keer laden kan een paar seconden duren terwijl de Python-omgeving in je browser opstart. Je werk wordt lokaal in die browser bewaard (niet gedeeld tussen apparaten) — download een notebook via het bestandsmenu als je het wil bewaren.</p>
+    <div class="field-row">
+      <label for="flavorSelect">Interface</label>
+      <select id="flavorSelect">
+        <option value="lab">JupyterLab</option>
+        <option value="retro">Notebook (klassieke weergave)</option>
+      </select>
+      <details style="margin-left:0.5rem;">
+        <summary style="cursor:pointer; font-size:0.82rem; color:var(--muted); display:inline;">Geavanceerd</summary>
+        <div class="field-row" style="margin-top:0.5rem;">
+          <label for="baseUrlInput">Basis-URL (enkel nodig als deze pagina ergens anders staat dan de JupyterLite-site zelf)</label>
+          <input type="text" id="baseUrlInput" style="min-width:260px;" placeholder="leeg = relatief t.o.v. deze pagina">
         </div>
-        <div class="hint" id="pathAutoNote" style="display:none; color:var(--ok);">✓ Automatisch herkend op basis van de locatie van deze pagina — je hoeft hier normaal niets aan te passen.</div>
-        <div class="hint" id="pathWarning" style="display:none; color:var(--warn);">⚠️ Kon het pad niet automatisch herkennen (bv. omdat deze pagina niet rechtstreeks als bestand geopend is). Vul het hierboven zelf in — anders werken de "Open"-links en het commando hieronder niet.</div>
-      </div>
-
-      <div id="jupyterFields" style="display:none;">
-        <div class="field-row">
-          <label for="baseUrlInput">Server-URL</label>
-          <input type="url" id="baseUrlInput" value="http://localhost:8888" placeholder="http://localhost:8888">
-          <label for="flavorSelect">Interface</label>
-          <select id="flavorSelect">
-            <option value="notebook">Jupyter Notebook</option>
-            <option value="lab">JupyterLab</option>
-          </select>
-          <label for="tokenInput">Token (verplicht)</label>
-          <input type="text" id="tokenInput" placeholder="plak token uit serverconsole">
-          <button class="btn secondary" id="testBtn" type="button">Test verbinding</button>
-        </div>
-        <div class="hint" id="tokenWarning" style="display:none; color:var(--warn);">⚠️ Vul hierboven je token in — zonder token werken de "Open"-links niet en vraagt Jupyter zelf om in te loggen.</div>
-        <details style="margin-top:0.3rem;">
-          <summary style="cursor:pointer; font-size:0.82rem; color:var(--muted);">Waar vind ik mijn token?</summary>
-          <div class="hint" style="margin-top:0.4rem;">
-            <strong>Optie 1:</strong> Kijk in het terminalvenster waar je de server gestart hebt. Daar staat een regel zoals <code class="cmd" style="display:inline; padding:0.1rem 0.4rem;">http://localhost:8888/?token=3f9a1b2c...</code> — alles na <code>token=</code> is je token.<br>
-            <strong>Optie 2:</strong> Staat de server al open in je browser? Kijk dan in de adresbalk van dat tabblad — ook daar staat <code>?token=...</code>.<br>
-            <strong>Optie 3:</strong> Typ in een <em>nieuw</em> terminalvenster <code>jupyter notebook list</code> (of <code>jupyter server list</code>) terwijl de server draait — dat toont de URL met token van elke actieve server.
-          </div>
-        </details>
-
-        <hr style="border:none; border-top:1px solid var(--border); margin:0.6rem 0;">
-        <div class="hint">Nog geen server gestart? Kopieer dit commando in een Terminal-venster (macOS) of een (Anaconda) Prompt-venster (Windows) en druk op Enter:</div>
-        <div class="cmd-row">
-          <code class="cmd" id="cmdGenerated"></code>
-          <button class="btn secondary" data-copy="cmdGenerated" type="button">Kopieer</button>
-        </div>
-        <details style="margin-top:0.5rem;">
-          <summary style="cursor:pointer; font-size:0.82rem; color:var(--muted);">Hoe open ik een Terminal of Anaconda Prompt?</summary>
-          <div class="hint" style="margin-top:0.4rem;">
-            <strong>macOS:</strong> druk op ⌘ + Spatie, typ "Terminal" en druk op Enter.<br>
-            <strong>Windows:</strong> klik op Start, typ "Anaconda Prompt" (als Anaconda geïnstalleerd is) of "cmd", en klik op het resultaat.
-          </div>
-        </details>
-      </div>
-
-      <div id="vscodeFields" style="display:none;">
-        <div class="hint">Zodra het pad hierboven is ingevuld, openen alle "Open"-links op deze pagina het notebook rechtstreeks in VS Code — geen server nodig.</div>
-        <div class="field-row">
-          <button class="btn" id="vscodeOpenBtn" type="button">📝 Open deze map nu in VS Code</button>
-        </div>
-
-        <details style="margin-top:0.7rem;" open>
-          <summary style="cursor:pointer; font-size:0.85rem; font-weight:600;">🐍 VS Code gebruiken met de Anaconda "base"-kernel</summary>
-          <div class="hint" style="margin-top:0.5rem;">
-            <strong>1.</strong> Zorg dat de extensies <strong>Python</strong> en <strong>Jupyter</strong> (beide van Microsoft) geïnstalleerd zijn in VS Code (tabblad Extensions, links in de zijbalk — of ⌘/Ctrl+Shift+X).<br>
-            <strong>2.</strong> Open een notebook via een link op deze pagina, of via de knop hierboven.<br>
-            <strong>3.</strong> Klik rechtsboven in het notebookvenster op <strong>"Select Kernel"</strong>.<br>
-            <strong>4.</strong> Kies <strong>"Python Environments…"</strong> en selecteer de omgeving genaamd <strong>"base"</strong> — dat is je standaard Anaconda-installatie.<br>
-            <strong>5.</strong> VS Code onthoudt deze keuze per notebook: dit moet je normaal maar één keer per notebook doen.
-          </div>
-          <div class="hint" style="margin-top:0.6rem;">
-            <em>Wil je dat elk notebook in deze map automatisch met "base" start, zonder telkens te moeten kiezen?</em> Maak in deze map een bestand <code>.vscode/settings.json</code> met daarin het pad naar jouw Anaconda-python, bijvoorbeeld:
-          </div>
-          <div class="cmd-row">
-            <code class="cmd">{ "python.defaultInterpreterPath": "&lt;pad naar anaconda3/bin/python of anaconda3\python.exe&gt;" }</code>
-          </div>
-          <div class="hint">Dit pad verschilt per computer (macOS meestal <code>~/anaconda3/bin/python</code> of <code>~/opt/anaconda3/bin/python</code>; Windows meestal <code>C:\Users\...\anaconda3\python.exe</code>) — makkelijker is stap 3-4 hierboven te volgen, dat werkt altijd zonder paden op te zoeken.</div>
-        </details>
-
-        <details style="margin-top:0.6rem;">
-          <summary style="cursor:pointer; font-size:0.85rem; color:var(--warn); font-weight:600;">⚠️ Geen "base"-omgeving te vinden? Zo los je dat op</summary>
-          <div class="hint" style="margin-top:0.5rem;">
-            Deze pagina kan <strong>niet automatisch controleren</strong> of Anaconda op jouw computer geïnstalleerd is — een webpagina heeft daar geen toegang toe. Volg deze stappen om het zelf na te gaan:
-          </div>
-          <div class="hint" style="margin-top:0.4rem;">
-            <strong>Controleren of Anaconda geïnstalleerd is:</strong><br>
-            • Zoek naar en open "Anaconda Navigator" via Spotlight (macOS) of het Start-menu (Windows). Verschijnt het niet? Dan is Anaconda waarschijnlijk niet (correct) geïnstalleerd.<br>
-            • Of typ <code>conda --version</code> in een Terminal/Anaconda Prompt. Krijg je een versienummer terug, dan werkt Anaconda.
-          </div>
-          <div class="hint" style="margin-top:0.4rem;">
-            <strong>Als Anaconda wél werkt, maar niet verschijnt in VS Code's "Select Kernel":</strong><br>
-            • Herstart VS Code volledig nadat je Anaconda geïnstalleerd hebt — de Python-extensie zoekt omgevingen enkel bij het opstarten.<br>
-            • Controleer of de Python-extensie geïnstalleerd en ingeschakeld is (zie stap 1 hierboven).<br>
-            • Klik bij "Select Kernel" op het vernieuw-icoontje, of gebruik Command Palette (⌘/Ctrl+Shift+P) → "Python: Select Interpreter" om te zien welke omgevingen VS Code vindt.
-          </div>
-          <div class="hint" style="margin-top:0.4rem;">
-            <strong>Als het commando hierboven ("jupyter notebook") een foutmelding geeft</strong> zoals <code>command not found: jupyter</code> (macOS) of <code>'jupyter' is not recognized</code> (Windows): Anaconda staat niet op het PATH van je systeem. Gebruik dan specifiek de <strong>"Anaconda Prompt"</strong> (Windows) in plaats van een gewone terminal, of herinstalleer Anaconda met de optie "Add Anaconda to my PATH environment variable" aangevinkt.
-          </div>
-          <div class="hint" style="margin-top:0.4rem;">
-            Nog steeds vastzitten? Herinstalleer Anaconda via <code>anaconda.com/download</code> en probeer opnieuw.
-          </div>
-        </details>
-      </div>
+      </details>
     </div>
   </div>
 </div>
@@ -403,14 +237,16 @@
 
 <main id="main"></main>
 
-<footer>Gegenereerd op basis van de markdown-headers, imports en functiedefinities in elke notebook. "Dekt" bij oefeningen is een inhoudelijke inschatting op basis van gebruikte concepten, geen officiële leerplanmapping.</footer>
+<footer>
+  Gegenereerd op basis van de markdown-headers, imports en functiedefinities in elke notebook. "Dekt" bij oefeningen is een inhoudelijke inschatting op basis van gebruikte concepten, geen officiële leerplanmapping.<br>
+  Liever lokaal werken met je eigen Anaconda-installatie en VS Code? Gebruik dan <code>index.html</code> uit de cursusmap in plaats van deze pagina.
+</footer>
 
-<!-- Precomputed TF-IDF search index over notebook content (build_search_index.py), kept in a
-     separate file so index.html stays manageable and so it loads via <script src> — plain fetch()
-     of a local file is unreliable when this page is opened as file://. -->
+<!-- Same precomputed TF-IDF search index as the local index.html — see build_search_index.py. -->
 <script src="search-index.js"></script>
 <script>
 /* ================= DATA ================= */
+/* Identical to index.html's DATA — keep both files in sync when notebooks change. */
 const DATA = {
   1: {
     groups: [
@@ -435,13 +271,13 @@ const DATA = {
           {code:"1A.15", title:"Errors / Debuggen", path:"Deel 1 - syntax/Deel A/1A.15-fouten_debuggen.ipynb", subject:"10 veelvoorkomende foutmeldingen: Syntax, Indentation, ZeroDivision, Name, Value, Key, Index, Attribute, Type, Overflow", libs:["math"]},
         ],
         exercises: [
-          {code:"1a", title:"Datastructuren — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel A/Oefeningen/1a.datastructuren-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel A/Oefeningen/1a.datastructuren-debug-oplossing.ipynb",
+          {code:"1a", title:"Datastructuren — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel A/Oefeningen/1A.a-datastructuren-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel A/Oefeningen/1A.a-datastructuren-debug-oplossing.ipynb",
            desc:"9 bewust foute codefragmenten herstellen rond dictionaries, sets, tuples en lijsten (bv. KeyError bij tellen, dict aanpassen tijdens iteratie, tuple muteren).", covers:["1A.3 Sets","1A.4 Lijsten","1A.5 Dictionaries"], libs:[]},
-          {code:"1b", title:"Controlestroom — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel A/Oefeningen/1b.control_flow-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel A/Oefeningen/1b.control_flow-debug-oplossing.ipynb",
+          {code:"1b", title:"Controlestroom — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel A/Oefeningen/1A.b-control_flow-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel A/Oefeningen/1A.b-control_flow-debug-oplossing.ipynb",
            desc:"13 debug-fragmenten rond lussen, operatoren en indexering (off-by-one, oneindige lus, hergebruikte lusvariabele, break vs. continue, enumerate-verwarring).", covers:["1A.6 Operatoren","1A.7 Conditionals","1A.8 Iteraties"], libs:[]},
-          {code:"1c", title:"Functies en comprehensions — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel A/Oefeningen/1c.functies_comprehensions-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel A/Oefeningen/1c.functies_comprehensions-debug-oplossing.ipynb",
+          {code:"1c", title:"Functies en comprehensions — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel A/Oefeningen/1A.c-functies_comprehensions-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel A/Oefeningen/1A.c-functies_comprehensions-debug-oplossing.ipynb",
            desc:"7 debug-fragmenten rond functies en comprehensions (vergeten return, mutable default argument, botsende sleutels, filter() zonder list()).", covers:["1A.9 Comprehensions","1A.11 Functies","1A.12 Filter- en mapfuncties"], libs:[]},
-          {code:"1d", title:"Voorbeeld examenvragen — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel A/Oefeningen/1d.voorbeeld_examenvragen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel A/Oefeningen/1d.voorbeeld_examenvragen-debug-oplossing.ipynb",
+          {code:"1d", title:"Voorbeeld examenvragen — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel A/Oefeningen/1A.d-voorbeeld_examenvragen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel A/Oefeningen/1A.d-voorbeeld_examenvragen-debug-oplossing.ipynb",
            desc:"Examenstijl debug-oefeningen op (bijna) volledige functies: is_anagram, vertaal_naar_binair, controleer_aandelen, bereken_factuur, bereken_overuren.", covers:["1A.10 Strings","1A.11 Functies"], libs:["numpy"]},
         ]
       },
@@ -453,19 +289,20 @@ const DATA = {
           {code:"1B.2", title:"Pandas", path:"Deel 1 - syntax/Deel B/1B.2-pandas.ipynb", subject:"Series en DataFrame, hun aanmaak en basisgebruik", libs:["numpy","pandas"]},
           {code:"1B.3", title:"Pandas — werken met echte data", path:"Deel 1 - syntax/Deel B/1B.3-pandas-data.ipynb", subject:"Een echte dataset (COVID-19-cijfers) inlezen, kolommen, rijen doorlopen, filteren, sorteren/groeperen, ontbrekende waarden, grafieken, wegschrijven", libs:["numpy","pandas","matplotlib"]},
           {code:"1B.4", title:"Pandas — use cases", path:"Deel 1 - syntax/Deel B/1B.4-pandas-cases.ipynb", subject:"3 toegepaste cases, o.a. omgaan met ontbrekende (NaN) data via dropna()", libs:["numpy","pandas"]},
+          {code:"1B.5", title:"Marketing", path:"Deel 1 - syntax/Deel B/1B.5-marketing_voorbeelden.ipynb", subject:"Klantengegevens simuleren, marketingacties toewijzen, Customer Lifetime Value berekenen, klanten filteren en visualiseren", libs:["numpy","pandas","matplotlib"]},
         ],
         exercises: [
-          {code:"1B.1", title:"Debug oefeningen — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel B/Oefeningen - deel B/1B.1-oefeningen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen - deel B/1B.1-oefeningen-debug-oplossing.ipynb",
+          {code:"1B.1", title:"Debug oefeningen — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel B/Oefeningen/1B.1-oefeningen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen/1B.1-oefeningen-debug-oplossing.ipynb",
            desc:"3 korte NumPy-functies met telkens één bug (rij_sommen: axis-verwarring, tel_boven_grens, binnenmatrix).", covers:["1B.1 NumPy"], libs:["numpy"]},
-          {code:"1B.1", title:"Oefeningen — deel 1", opgave:"Deel 1 - syntax/Deel B/Oefeningen - deel B/1B.1-oefeningen_deel_1-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen - deel B/1B.1-oefeningen_deel_1-oplossing.ipynb",
+          {code:"1B.1", title:"Oefeningen — deel 1", opgave:"Deel 1 - syntax/Deel B/Oefeningen/1B.1-start_oefeningen_deel_1-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen/1B.1-start_oefeningen_deel_1-oplossing.ipynb",
            desc:"Basisoefeningen NumPy-syntax: een 6x6-sudoku als array (5 vragen) en een puntenanalyse-opdracht (5 vragen).", covers:["1B.1 NumPy"], libs:["numpy"]},
-          {code:"1B.1", title:"Voorbeeld examenvragen — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel B/Oefeningen - deel B/1B.1-voorbeeld_examenvragen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen - deel B/1B.1-voorbeeld_examenvragen-debug-oplossing.ipynb",
+          {code:"1B.1", title:"Voorbeeld examenvragen — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel B/Oefeningen/1B.1-voorbeeld_examenvragen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen/1B.1-voorbeeld_examenvragen-debug-oplossing.ipynb",
            desc:"Examenstijl NumPy-debug: matrixeigenschappen controleren (vierkant + diagonaal, met is i.p.v. ==) en matrices vermenigvuldigen.", covers:["1B.1 NumPy"], libs:["numpy"]},
-          {code:"1B.2", title:"Debug oefeningen — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel B/Oefeningen - deel B/1B.2-oefeningen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen - deel B/1B.2-oefeningen-debug-oplossing.ipynb",
+          {code:"1B.2", title:"Debug oefeningen — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel B/Oefeningen/1B.2-oefeningen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen/1B.2-oefeningen-debug-oplossing.ipynb",
            desc:"3 korte Pandas-functies met telkens één bug (haal_geslaagden: >= vs. >, gemiddelde_per_klas, tel_categorie).", covers:["1B.2 Pandas"], libs:["pandas"]},
-          {code:"1B.2", title:"Oefeningen — deel 1", opgave:null, oplossing:"Deel 1 - syntax/Deel B/Oefeningen - deel B/1B.2-oefeningen_deel1-oplossing.ipynb",
+          {code:"1B.2", title:"Oefeningen — deel 1", opgave:null, oplossing:"Deel 1 - syntax/Deel B/Oefeningen/1B.2-start_oefeningen_deel1-oplossing.ipynb",
            desc:"Oefeningen op verkeersongevallendata (Statbel, 2020) en studentenscores — enkel de oplossing is beschikbaar, geen apart opgavebestand.", covers:["1B.2 Pandas","1B.3 Pandas — werken met echte data"], libs:["numpy","pandas"]},
-          {code:"1B.2", title:"Voorbeeld examenvragen — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel B/Oefeningen - deel B/1B.2-voorbeeld_examenvragen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen - deel B/1B.2-voorbeeld_examenvragen-debug-oplossing.ipynb",
+          {code:"1B.2", title:"Voorbeeld examenvragen — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel B/Oefeningen/1B.2-voorbeeld_examenvragen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen/1B.2-voorbeeld_examenvragen-debug-oplossing.ipynb",
            desc:"Examenstijl Pandas/NumPy-debug: axis-verwarring bij sum() die een IndexingError veroorzaakt, plus 3 verdere vragen.", covers:["1B.2 Pandas","1B.3 Pandas — werken met echte data"], libs:["numpy","pandas"]},
         ]
       }
@@ -507,114 +344,60 @@ const DATA = {
           {code:"3A", title:"Een language model gebouwd in NumPy", path:"Deel 3 - toepassingen/3A-mini-LLM-in_numpy.ipynb", subject:"Klein taalmodel op basis van de Transformer-architectuur, volledig in NumPy (tokenisatie, attention, softmax, training)", libs:["numpy"]},
           {code:"3B", title:"PageRank", path:"Deel 3 - toepassingen/3B-PageRank.ipynb", subject:"Het PageRank-algoritme (Google) toegepast op een webgraaf en op klantendoorverwijzingen tussen merken", libs:["numpy"]},
           {code:"3C", title:"EOQ", path:"Deel 3 - toepassingen/3C-EOQ.ipynb", subject:"Economic Order Quantity in voorraadbeheer: bestel- en voorraadkosten berekenen en optimaliseren met NumPy-matrices", libs:["numpy","matplotlib"]},
-          {code:"3C.2", title:"Marketing", path:"Deel 3 - toepassingen/3C.2 - Marketing.ipynb", subject:"Klantengegevens simuleren, marketingacties toewijzen, Customer Lifetime Value berekenen, klanten filteren en visualiseren", libs:["numpy","pandas","matplotlib"]},
           {code:"3D", title:"Prijsvoorspellingen en investeren", path:"Deel 3 - toepassingen/3D-prijs_voorspelling.ipynb", subject:"Beleggingsstrategie op AAPL-koersdata (tijdreeksen, uitsluitend ter illustratie)", libs:["numpy","pandas","matplotlib"]},
           {code:"3F", title:"Project planning (CPM/PERT)", path:"Deel 3 - toepassingen/3F-project_planning.ipynb", subject:"Projectplanning als afhankelijkheidsgraaf: earliest/latest start-finish tijden, slack en het kritieke pad berekenen via recursie, met Gantt-grafiek", libs:["numpy","pandas","matplotlib","networkx"]},
         ],
-        exercises: []
+        exercises: [
+          {code:"3B", title:"PageRank — oefening", notebook:"Deel 3 - toepassingen/3-oefeningen.ipynb",
+           desc:"Twee implementaties van PageRank naast elkaar: matrix-gebaseerd met NumPy (met dangling nodes en convergentiecheck) en dictionary-gebaseerd op een graaf van paginalinks.", covers:["3B PageRank"], libs:["numpy"]},
+        ]
       }
     ]
   }
 };
 
-/* ================= SETTINGS ================= */
-/* 'file' was a mode from an earlier version of this page (no longer offered) — treat it as 'vscode'. */
-const storedMode = localStorage.getItem('soep1_mode');
+/* ================= SETTINGS =================
+   No path, no token: JupyterLite serves the notebooks itself, so a link only
+   needs the JupyterLite interface (lab/retro) and, optionally, a base URL for
+   the rare case this page is hosted somewhere other than the JupyterLite site
+   itself (e.g. testing locally via `jupyter lite serve`). */
 const settings = {
-  mode: (storedMode && storedMode !== 'file') ? storedMode : 'vscode',
-  baseUrl: localStorage.getItem('soep1_baseUrl') || 'http://localhost:8888',
-  flavor: localStorage.getItem('soep1_flavor') || 'notebook',
-  token: localStorage.getItem('soep1_token') || '',
+  flavor: localStorage.getItem('lite_flavor') || 'lab',
+  baseUrl: localStorage.getItem('lite_baseUrl') || '',
 };
 
 function saveSettings() {
-  localStorage.setItem('soep1_mode', settings.mode);
-  localStorage.setItem('soep1_baseUrl', settings.baseUrl);
-  localStorage.setItem('soep1_flavor', settings.flavor);
-  localStorage.setItem('soep1_token', settings.token);
+  localStorage.setItem('lite_flavor', settings.flavor);
+  localStorage.setItem('lite_baseUrl', settings.baseUrl);
 }
 
 function encodePath(relpath) {
   return relpath.split('/').map(encodeURIComponent).join('/');
 }
 
-/* ---- root path helpers (shared by VS Code links and the Jupyter start command) ---- */
-function currentRootPath() {
-  const input = document.getElementById('rootPathInput');
-  return input ? input.value.trim() : '';
-}
-
-/* This page's own file:// URL already tells us exactly where it lives on disk —
-   most students never need to type a path at all. Only fails when the page is
-   served over http(s) instead of opened directly as a file. */
-function detectPageFolderPath() {
-  if (location.protocol !== 'file:') return '';
-  let p;
-  try { p = decodeURIComponent(location.pathname); } catch (e) { p = location.pathname; }
-  const idx = p.lastIndexOf('/');
-  if (idx === -1) return '';
-  p = p.substring(0, idx);
-  if (/^\/[a-zA-Z]:/.test(p)) { p = p.substring(1).replace(/\//g, '\\'); } // "/C:/Users/.." -> "C:\Users\.."
-  return p;
-}
-
-/* OS is inferred from the path itself (drive letter or backslashes = Windows),
-   so there's no separate OS picker to get out of sync with what's actually typed. */
-function isWindowsPath(p) {
-  return /^[a-zA-Z]:[\\/]/.test(p) || p.indexOf('\\') !== -1;
-}
-
-function toForwardSlashes(p) {
-  return p.replace(/\\/g, '/').replace(/\/+$/, '');
-}
-
-/* vscode://file expects exactly one slash before the path: "/Users/..." (mac/linux,
-   already has a leading slash) or "/c:/..." (Windows, needs one added). */
-function vscodeUriFromAbsPath(absPath) {
-  const p = absPath.startsWith('/') ? absPath : '/' + absPath;
-  return 'vscode://file' + encodeURI(p);
-}
-
-function vscodeFileUri(rootPath, relpath) {
-  return vscodeUriFromAbsPath(toForwardSlashes(rootPath) + '/' + relpath);
-}
-
-function vscodeFolderUri(rootPath) {
-  return vscodeUriFromAbsPath(toForwardSlashes(rootPath));
-}
-
-function buildJupyterStartCommand(rootPath, flavor) {
-  const jcmd = flavor === 'lab' ? 'jupyter lab' : 'jupyter notebook';
-  return isWindowsPath(rootPath) ? `cd /d "${rootPath}" && ${jcmd}` : `cd "${rootPath}" && ${jcmd}`;
-}
-
+/* This same file is served from two places by the deploy workflow:
+   - dist/index.html (the site root — deploy.yml copies it there so visitors
+     land on the navigator instead of JupyterLite's default placeholder page)
+   - dist/files/index.html (its natural location, since content/ is mounted
+     into JupyterLite's contents)
+   /lab/ and /retro/ always live at the site root, so the right "../" prefix
+   depends on which of the two copies is currently being viewed. Detect it
+   from the URL instead of hardcoding one location. If you host this page
+   somewhere else entirely, set the base URL in "Geavanceerd" instead. */
 function buildHref(relpath) {
   if (!relpath) return null;
-  if (settings.mode === 'jupyter' && settings.baseUrl) {
-    const base = settings.baseUrl.replace(/\/$/, '');
-    const seg = settings.flavor === 'lab' ? '/lab/tree/' : '/notebooks/';
-    let url = base + seg + encodePath(relpath);
-    if (settings.token) url += '?token=' + encodeURIComponent(settings.token);
-    return url;
-  }
-  if (settings.mode === 'vscode') {
-    const root = currentRootPath();
-    return root ? vscodeFileUri(root, relpath) : '#';
-  }
-  return encodePath(relpath);
+  const seg = settings.flavor === 'retro' ? 'retro/notebooks/index.html' : 'lab/index.html';
+  const base = settings.baseUrl.trim();
+  const prefix = base
+    ? base.replace(/\/$/, '') + '/'
+    : (/\/files\/[^/]*$/.test(location.pathname) ? '../' : '');
+  return prefix + seg + '?path=' + encodePath(relpath);
 }
 
 function refreshAllLinks() {
-  const blockedPath = settings.mode === 'vscode' && !currentRootPath();
-  const blockedToken = settings.mode === 'jupyter' && !settings.token;
   document.querySelectorAll('a[data-relpath]').forEach(a => {
     a.href = buildHref(a.dataset.relpath);
-    a.target = settings.mode === 'jupyter' ? '_blank' : '';
-    a.classList.toggle('needs-path', blockedPath);
-    a.classList.toggle('needs-token', blockedToken);
-    a.title = blockedPath ? 'Vul eerst het volledige pad in bij het paneel bovenaan de pagina'
-            : blockedToken ? 'Vul eerst je Jupyter-token in bij het paneel bovenaan de pagina'
-            : '';
+    a.target = '_blank';
   });
 }
 
@@ -697,11 +480,7 @@ function setupTabs() {
   });
 }
 
-/* ================= SEARCH ================= */
-/* SEARCH_INDEX (from search-index.js) maps notebook relpath -> {term: tfidf weight},
-   precomputed offline from actual notebook content — see build_search_index.py.
-   This lets search match on what's *inside* a notebook (function names, library
-   calls, dataset terms, ...), not just the short summary text visible on the card. */
+/* ================= SEARCH (identical to index.html) ================= */
 function tokenizeQuery(q) {
   return (q.toLowerCase().match(/[a-zà-ÿ0-9_]{3,}/gi) || []);
 }
@@ -771,137 +550,30 @@ function setupSearch() {
   });
 }
 
-/* ================= JUPYTER / VS CODE PANEL ================= */
-function setupJupyterPanel() {
-  const modeJupyter = document.getElementById('modeJupyter');
-  const modeVscode = document.getElementById('modeVscode');
-  const baseUrlInput = document.getElementById('baseUrlInput');
+/* ================= INTERFACE PANEL ================= */
+function setupLitePanel() {
   const flavorSelect = document.getElementById('flavorSelect');
-  const tokenInput = document.getElementById('tokenInput');
-  const tokenWarning = document.getElementById('tokenWarning');
-  const pathFields = document.getElementById('pathFields');
-  const rootPathInput = document.getElementById('rootPathInput');
-  const pathWarning = document.getElementById('pathWarning');
-  const pathAutoNote = document.getElementById('pathAutoNote');
-  const resetPathBtn = document.getElementById('resetPathBtn');
-  const jupyterFields = document.getElementById('jupyterFields');
-  const vscodeFields = document.getElementById('vscodeFields');
-  const cmdGenerated = document.getElementById('cmdGenerated');
-  const vscodeOpenBtn = document.getElementById('vscodeOpenBtn');
-  const panelStatus = document.getElementById('panelStatus');
-  const panelBody = document.getElementById('panelBody');
-  const panelToggle = document.getElementById('panelToggle');
-  const testBtn = document.getElementById('testBtn');
+  const baseUrlInput = document.getElementById('baseUrlInput');
 
-  baseUrlInput.value = settings.baseUrl;
   flavorSelect.value = settings.flavor;
-  tokenInput.value = settings.token;
-  const storedPath = localStorage.getItem('soep1_rootpath');
-  rootPathInput.value = storedPath || detectPageFolderPath();
+  baseUrlInput.value = settings.baseUrl;
 
-  if (settings.mode === 'jupyter') modeJupyter.checked = true;
-  else modeVscode.checked = true;
-
-  function applyModeVisibility() {
-    pathFields.style.display = 'block';
-    jupyterFields.style.display = settings.mode === 'jupyter' ? 'block' : 'none';
-    vscodeFields.style.display = settings.mode === 'jupyter' ? 'none' : 'block';
-  }
-  applyModeVisibility();
-
-  function updateStatus() {
-    if (settings.mode === 'jupyter') {
-      panelStatus.textContent = 'Jupyter: ' + settings.baseUrl;
-      panelStatus.className = 'panel-status ok';
-    } else {
-      panelStatus.textContent = 'VS Code-links';
-      panelStatus.className = 'panel-status ok';
-    }
-  }
-  updateStatus();
-
-  function updateTokenState() {
-    tokenWarning.style.display = (settings.mode === 'jupyter' && !tokenInput.value.trim()) ? 'block' : 'none';
-  }
-  updateTokenState();
-
-  function updatePathDependent() {
-    const root = rootPathInput.value.trim();
-    const detected = detectPageFolderPath();
-    const isAuto = !!root && root === detected && !localStorage.getItem('soep1_rootpath');
-    pathAutoNote.style.display = isAuto ? 'block' : 'none';
-    pathWarning.style.display = root ? 'none' : 'block';
-    resetPathBtn.style.display = (detected && root !== detected) ? 'inline-block' : 'none';
-    cmdGenerated.textContent = root ? buildJupyterStartCommand(root, flavorSelect.value) : '(vul eerst het pad hierboven in)';
+  flavorSelect.addEventListener('change', () => {
+    settings.flavor = flavorSelect.value;
+    saveSettings();
     refreshAllLinks();
-  }
-  updatePathDependent();
-
-  [modeJupyter, modeVscode].forEach(r => r.addEventListener('change', () => {
-    settings.mode = modeJupyter.checked ? 'jupyter' : 'vscode';
-    applyModeVisibility();
-    saveSettings(); updateStatus(); updateTokenState(); updatePathDependent();
-  }));
-  baseUrlInput.addEventListener('input', () => { settings.baseUrl = baseUrlInput.value; saveSettings(); updateStatus(); refreshAllLinks(); });
-  flavorSelect.addEventListener('change', () => { settings.flavor = flavorSelect.value; saveSettings(); updatePathDependent(); });
-  tokenInput.addEventListener('input', () => { settings.token = tokenInput.value; saveSettings(); updateTokenState(); refreshAllLinks(); });
-  rootPathInput.addEventListener('input', () => {
-    localStorage.setItem('soep1_rootpath', rootPathInput.value.trim());
-    updatePathDependent();
   });
-
-  resetPathBtn.addEventListener('click', () => {
-    localStorage.removeItem('soep1_rootpath');
-    rootPathInput.value = detectPageFolderPath();
-    updatePathDependent();
-  });
-
-  vscodeOpenBtn.addEventListener('click', () => {
-    const root = rootPathInput.value.trim();
-    if (!root) { rootPathInput.focus(); return; }
-    window.location.href = vscodeFolderUri(root);
-  });
-
-  panelToggle.addEventListener('click', () => panelBody.classList.toggle('collapsed'));
-
-  document.querySelectorAll('[data-copy]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const text = document.getElementById(btn.dataset.copy).textContent;
-      navigator.clipboard.writeText(text).then(() => {
-        const orig = btn.textContent;
-        btn.textContent = 'Gekopieerd!';
-        setTimeout(() => btn.textContent = orig, 1500);
-      });
-    });
-  });
-
-  document.getElementById('main').addEventListener('click', (e) => {
-    const pathBlocked = e.target.closest('a.needs-path');
-    const tokenBlocked = e.target.closest('a.needs-token');
-    if (pathBlocked) { e.preventDefault(); rootPathInput.focus(); rootPathInput.scrollIntoView({behavior:'smooth', block:'center'}); }
-    else if (tokenBlocked) { e.preventDefault(); tokenInput.focus(); tokenInput.scrollIntoView({behavior:'smooth', block:'center'}); }
-  });
-
-  testBtn.addEventListener('click', async () => {
-    testBtn.textContent = 'Testen...';
-    try {
-      const base = settings.baseUrl.replace(/\/$/, '');
-      const url = base + '/api/status' + (settings.token ? ('?token=' + encodeURIComponent(settings.token)) : '');
-      const resp = await fetch(url, { mode: 'cors' });
-      if (resp.ok) { panelStatus.textContent = 'Verbonden ✓'; panelStatus.className = 'panel-status ok'; }
-      else { panelStatus.textContent = 'Server antwoordt niet OK'; panelStatus.className = 'panel-status warn'; }
-    } catch (e) {
-      panelStatus.textContent = 'Kan server niet bereiken';
-      panelStatus.className = 'panel-status warn';
-    }
-    testBtn.textContent = 'Test verbinding';
+  baseUrlInput.addEventListener('input', () => {
+    settings.baseUrl = baseUrlInput.value;
+    saveSettings();
+    refreshAllLinks();
   });
 }
 
 renderAll();
 setupTabs();
 setupSearch();
-setupJupyterPanel();
+setupLitePanel();
 </script>
 
 </body>
