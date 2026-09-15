@@ -3,6 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <title>SOEP1 — Cursusmateriaal (JupyterLite)</title>
+<!-- Required by JupyterLite itself: when this page is copied over dist/index.html
+     (see deploy.yml), the /lab/ and /retro/ apps fetch the site root's index.html
+     at boot to read this tag (config-utils.js: getPageConfig). Without it they
+     crash before ever loading ("Cannot read properties of null (reading
+     'textContent')") and every notebook link appears to do nothing. The original
+     JupyterLite-generated index.html we're replacing always has this exact tag,
+     with an empty {} body — real per-app config comes from jupyter-lite.json
+     instead, so this can stay static. -->
+<script id="jupyter-config-data" type="application/json" data-jupyter-lite-root=".">
+      {}
+    </script>
 <style>
   :root {
     --bg: #f7f7f5;
