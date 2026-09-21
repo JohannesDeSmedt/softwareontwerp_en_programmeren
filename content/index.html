@@ -16,41 +16,41 @@
     </script>
 <style>
   :root {
-    --bg: #f7f7f5;
+    --bg: #f3f5f7;
     --card: #ffffff;
-    --border: #e3e1dc;
-    --text: #2b2a27;
-    --muted: #7a7870;
-    --accent: #af5b3f;
-    --accent-soft: #f3e6df;
-    --opgave: #3f6b52;
-    --opgave-soft: #e7f0ea;
-    --chip: #eee9e2;
-    --chip-text: #5a5750;
-    --lib: #3b5b7a;
-    --lib-soft: #e3ebf2;
-    --panel: #f0ede6;
-    --ok: #3f6b52;
-    --warn: #a3452f;
+    --border: #d8d9da;
+    --text: #1c1f22;
+    --muted: #55595c;
+    --accent: #004070;
+    --accent-soft: #d4e7f3;
+    --opgave: #3d454c;
+    --opgave-soft: #e9ebed;
+    --chip: #eceef0;
+    --chip-text: #55595c;
+    --lib: #003a65;
+    --lib-soft: #e5eff6;
+    --panel: #eef2f5;
+    --ok: #2e7d4f;
+    --warn: #b3401e;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #1c1b19;
-      --card: #262523;
-      --border: #3a3834;
-      --text: #ece9e3;
-      --muted: #a19d94;
-      --accent: #e08a63;
-      --accent-soft: #3a2a22;
-      --opgave: #7fb894;
-      --opgave-soft: #22322a;
-      --chip: #33312d;
-      --chip-text: #c9c5bc;
-      --lib: #8fb5da;
-      --lib-soft: #22303d;
-      --panel: #232220;
-      --ok: #7fb894;
-      --warn: #e08a63;
+      --bg: #10151c;
+      --card: #1a212b;
+      --border: #2d3745;
+      --text: #e6eaee;
+      --muted: #94a0ac;
+      --accent: #5b9bd5;
+      --accent-soft: #1c3550;
+      --opgave: #b7c0c9;
+      --opgave-soft: #2a323c;
+      --chip: #232b35;
+      --chip-text: #b7c0c9;
+      --lib: #8fb8dc;
+      --lib-soft: #1c2f42;
+      --panel: #171d25;
+      --ok: #6fbf8b;
+      --warn: #e0a35f;
     }
   }
   * { box-sizing: border-box; }
@@ -62,12 +62,12 @@
     line-height: 1.45;
   }
   header {
-    padding: 2rem 2rem 0.5rem;
-    max-width: 1200px;
-    margin: 0 auto;
+    background: var(--accent);
+    padding: 2rem 2rem 1.4rem;
   }
-  h1 { margin: 0 0 0.2rem; font-size: 1.6rem; }
-  .sub { color: var(--muted); font-size: 0.95rem; }
+  header .inner { max-width: 1200px; margin: 0 auto; }
+  h1 { margin: 0 0 0.3rem; font-size: 1.6rem; color: #fff; font-weight: 700; }
+  .sub { color: #cfe0ee; font-size: 0.95rem; }
 
   #lite-panel {
     max-width: 1200px;
@@ -77,7 +77,7 @@
   .panel-box {
     background: var(--panel);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 6px;
     padding: 1rem 1.2rem;
   }
   .panel-box p { margin: 0.3rem 0; font-size: 0.88rem; }
@@ -86,7 +86,7 @@
   select, input[type=text] {
     padding: 0.4rem 0.6rem;
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: 4px;
     background: var(--card);
     color: var(--text);
     font-size: 0.88rem;
@@ -101,7 +101,7 @@
     padding: 0.6rem 0.9rem;
     font-size: 0.95rem;
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 4px;
     background: var(--card);
     color: var(--text);
   }
@@ -114,7 +114,7 @@
   }
   .tab {
     padding: 0.5rem 1.1rem;
-    border-radius: 999px;
+    border-radius: 4px;
     border: 1px solid var(--border);
     background: var(--card);
     color: var(--text);
@@ -141,7 +141,7 @@
     padding: 0.75rem 0.9rem;
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 6px;
     transition: border-color 0.15s, transform 0.1s;
   }
   .card:hover { border-color: var(--accent); transform: translateY(-1px); }
@@ -168,7 +168,7 @@
   .chip {
     font-size: 0.72rem;
     padding: 0.12rem 0.5rem;
-    border-radius: 999px;
+    border-radius: 3px;
     background: var(--chip);
     color: var(--chip-text);
   }
@@ -177,7 +177,7 @@
   .exercise {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 6px;
     padding: 0.8rem 1rem;
     margin-bottom: 0.6rem;
   }
@@ -198,7 +198,7 @@
     text-decoration: none;
     font-size: 0.82rem;
     padding: 0.3rem 0.7rem;
-    border-radius: 6px;
+    border-radius: 3px;
     font-weight: 600;
   }
   a.opgave { background: var(--accent-soft); color: var(--accent); }
@@ -213,8 +213,10 @@
 <body>
 
 <header>
+  <div class="inner">
   <h1>SOEP1 — Cursusmateriaal (in de browser, geen installatie nodig)</h1>
   <div class="sub">Volledige index van Deel 1, Deel 2 en Deel 3. Notebooks openen en draaien hier rechtstreeks in JupyterLite — je hoeft niets te installeren.</div>
+  </div>
 </header>
 
 <div id="lite-panel">
@@ -263,8 +265,11 @@ const DATA = {
     groups: [
       {
         label: "Deel A",
+        slideExercises: [
+          {code:"1A", title:"Oefeningen op de slides", opgave:"Deel 1 - syntax/1A-oefeningen_slides.ipynb", oplossing:"Deel 1 - syntax/1A-oefeningen_slides-oplossing.ipynb",
+           desc:"Korte herhalingsoefeningen per hoofdstuk, rechtstreeks aansluitend bij de slides (1.1 t/m 1.12) — o.a. functies met standaardargumenten (dubbel, verhoog), een kwadraat-functie en een kleine class Info.", covers:["1A.1 t/m 1A.12"], libs:["math"]},
+        ],
         topics: [
-          {code:"1A.0", title:"Introductie", path:"Deel 1 - syntax/1A.0-Introductie.ipynb", subject:"IDEs (Jupyter, VS Code, Spyder), eerste programma, compilatie vs. interpretatie, dynamische typering", libs:[]},
           {code:"1A.1", title:"Basis data types", path:"Deel 1 - syntax/Deel A/1A.1-basis_data_types.ipynb", subject:"Integers, floats, booleans, strings, dynamische typering, type-conversies", libs:[]},
           {code:"1A.2", title:"Variabelen", path:"Deel 1 - syntax/Deel A/1A.2-variabelen.ipynb", subject:"Toewijzing, geheugenreferenties, wat gebeurt er achter de schermen bij a = b", libs:[]},
           {code:"1A.3", title:"Sets", path:"Deel 1 - syntax/Deel A/1A.3-sets.ipynb", subject:"Verzamelingen, unieke elementen, add()-methode, verzamelingsoperaties", libs:[]},
@@ -457,7 +462,12 @@ function renderExercise(e) {
 
 function renderGroup(g) {
   const prefix = g.label ? `${g.label} — ` : '';
-  return `
+  const slideSection = (g.slideExercises && g.slideExercises.length) ? `
+  <section class="group">
+    <h2>${prefix}Oefeningen op de slides</h2>
+    ${g.slideExercises.map(renderExercise).join('')}
+  </section>` : '';
+  return `${slideSection}
   <section class="group">
     <h2>${prefix}Cursusmateriaal</h2>
     <div class="grid">${g.topics.map(renderTopicCard).join('')}</div>
