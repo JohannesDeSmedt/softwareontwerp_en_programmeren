@@ -223,20 +223,13 @@
   <div class="panel-box">
     <p>🚀 Klik op een notebook hieronder om het meteen te openen en uit te voeren — alles draait in je browser via <a href="https://jupyterlite.readthedocs.io/" target="_blank" rel="noopener">JupyterLite</a>, er is geen server, Anaconda of VS Code nodig.</p>
     <p class="hint">Eerste keer laden kan een paar seconden duren terwijl de Python-omgeving in je browser opstart. Je werk wordt lokaal in die browser bewaard (niet gedeeld tussen apparaten) — download een notebook via het bestandsmenu als je het wil bewaren.</p>
-    <div class="field-row">
-      <label for="flavorSelect">Interface</label>
-      <select id="flavorSelect">
-        <option value="lab">JupyterLab</option>
-        <option value="retro">Notebook (klassieke weergave)</option>
-      </select>
-      <details style="margin-left:0.5rem;">
-        <summary style="cursor:pointer; font-size:0.82rem; color:var(--muted); display:inline;">Geavanceerd</summary>
-        <div class="field-row" style="margin-top:0.5rem;">
-          <label for="baseUrlInput">Basis-URL (enkel nodig als deze pagina ergens anders staat dan de JupyterLite-site zelf)</label>
-          <input type="text" id="baseUrlInput" style="min-width:260px;" placeholder="leeg = relatief t.o.v. deze pagina">
-        </div>
-      </details>
-    </div>
+    <details>
+      <summary style="cursor:pointer; font-size:0.82rem; color:var(--muted);">Geavanceerd</summary>
+      <div class="field-row" style="margin-top:0.5rem;">
+        <label for="baseUrlInput">Basis-URL (enkel nodig als deze pagina ergens anders staat dan de JupyterLite-site zelf)</label>
+        <input type="text" id="baseUrlInput" style="min-width:260px;" placeholder="leeg = relatief t.o.v. deze pagina">
+      </div>
+    </details>
   </div>
 </div>
 
@@ -373,17 +366,17 @@ const DATA = {
 };
 
 /* ================= SETTINGS =================
-   No path, no token: JupyterLite serves the notebooks itself, so a link only
-   needs the JupyterLite interface (lab/retro) and, optionally, a base URL for
-   the rare case this page is hosted somewhere other than the JupyterLite site
+   No path, no token, no interface picker: every link opens the classic
+   Notebook view, never JupyterLab — its file-browser sidebar and cached
+   workspace state tend to confuse students who just want to open the one
+   notebook they clicked. A link only needs an optional base URL for the
+   rare case this page is hosted somewhere other than the JupyterLite site
    itself (e.g. testing locally via `jupyter lite serve`). */
 const settings = {
-  flavor: localStorage.getItem('lite_flavor') || 'lab',
   baseUrl: localStorage.getItem('lite_baseUrl') || '',
 };
 
 function saveSettings() {
-  localStorage.setItem('lite_flavor', settings.flavor);
   localStorage.setItem('lite_baseUrl', settings.baseUrl);
 }
 
@@ -396,18 +389,17 @@ function encodePath(relpath) {
      land on the navigator instead of JupyterLite's default placeholder page)
    - dist/files/index.html (its natural location, since content/ is mounted
      into JupyterLite's contents)
-   /lab/ and /notebooks/ always live at the site root, so the right "../" prefix
+   /notebooks/ always lives at the site root, so the right "../" prefix
    depends on which of the two copies is currently being viewed. Detect it
    from the URL instead of hardcoding one location. If you host this page
    somewhere else entirely, set the base URL in "Geavanceerd" instead. */
 function buildHref(relpath) {
   if (!relpath) return null;
-  const seg = settings.flavor === 'retro' ? 'notebooks/index.html' : 'lab/index.html';
   const base = settings.baseUrl.trim();
   const prefix = base
     ? base.replace(/\/$/, '') + '/'
     : (/\/files\/[^/]*$/.test(location.pathname) ? '../' : '');
-  return prefix + seg + '?path=' + encodePath(relpath);
+  return prefix + 'notebooks/index.html?path=' + encodePath(relpath);
 }
 
 function refreshAllLinks() {
@@ -573,17 +565,8 @@ function setupSearch() {
 
 /* ================= INTERFACE PANEL ================= */
 function setupLitePanel() {
-  const flavorSelect = document.getElementById('flavorSelect');
   const baseUrlInput = document.getElementById('baseUrlInput');
-
-  flavorSelect.value = settings.flavor;
   baseUrlInput.value = settings.baseUrl;
-
-  flavorSelect.addEventListener('change', () => {
-    settings.flavor = flavorSelect.value;
-    saveSettings();
-    refreshAllLinks();
-  });
   baseUrlInput.addEventListener('input', () => {
     settings.baseUrl = baseUrlInput.value;
     saveSettings();
