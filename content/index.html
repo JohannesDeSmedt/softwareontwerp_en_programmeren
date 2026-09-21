@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>SOEP1 — Cursusmateriaal (JupyterLite)</title>
 <!-- Required by JupyterLite itself: when this page is copied over dist/index.html
-     (see deploy.yml), the /lab/ and /retro/ apps fetch the site root's index.html
+     (see deploy.yml), the /lab/ and /notebooks/ apps fetch the site root's index.html
      at boot to read this tag (config-utils.js: getPageConfig). Without it they
      crash before ever loading ("Cannot read properties of null (reading
      'textContent')") and every notebook link appears to do nothing. The original
@@ -396,13 +396,13 @@ function encodePath(relpath) {
      land on the navigator instead of JupyterLite's default placeholder page)
    - dist/files/index.html (its natural location, since content/ is mounted
      into JupyterLite's contents)
-   /lab/ and /retro/ always live at the site root, so the right "../" prefix
+   /lab/ and /notebooks/ always live at the site root, so the right "../" prefix
    depends on which of the two copies is currently being viewed. Detect it
    from the URL instead of hardcoding one location. If you host this page
    somewhere else entirely, set the base URL in "Geavanceerd" instead. */
 function buildHref(relpath) {
   if (!relpath) return null;
-  const seg = settings.flavor === 'retro' ? 'retro/notebooks/index.html' : 'lab/index.html';
+  const seg = settings.flavor === 'retro' ? 'notebooks/index.html' : 'lab/index.html';
   const base = settings.baseUrl.trim();
   const prefix = base
     ? base.replace(/\/$/, '') + '/'
