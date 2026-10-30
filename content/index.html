@@ -2,6 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SOEP1 — Cursusmateriaal (JupyterLite)</title>
 <!-- Required by JupyterLite itself: when this page is copied over dist/index.html
      (see deploy.yml), the /lab/ and /notebooks/ apps fetch the site root's index.html
@@ -16,13 +17,13 @@
     </script>
 <style>
   :root {
-    --bg: #f3f5f7;
+    --bg: #f4f6f8;
     --card: #ffffff;
-    --border: #d8d9da;
+    --border: #d8dde2;
     --text: #1c1f22;
-    --muted: #55595c;
+    --muted: #5a6168;
     --accent: #004070;
-    --accent-soft: #d4e7f3;
+    --accent-soft: #dcebf6;
     --opgave: #3d454c;
     --opgave-soft: #e9ebed;
     --chip: #eceef0;
@@ -30,8 +31,17 @@
     --lib: #003a65;
     --lib-soft: #e5eff6;
     --panel: #eef2f5;
+    --code-bg: #10151c;
+    --code-text: #e7ecf1;
     --ok: #2e7d4f;
     --warn: #b3401e;
+    /* oefeningen: warme kleur zodat ze opvallen tussen de blauwe notebooks */
+    --ex: #c2570c;
+    --ex-strong: #9c4306;
+    --ex-soft: #fff4e8;
+    --ex-border: #f1cfae;
+    --ex-on: #ffffff;
+    --ex-shadow: rgba(194, 87, 12, 0.16);
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -39,7 +49,7 @@
       --card: #1a212b;
       --border: #2d3745;
       --text: #e6eaee;
-      --muted: #94a0ac;
+      --muted: #98a3ae;
       --accent: #5b9bd5;
       --accent-soft: #1c3550;
       --opgave: #b7c0c9;
@@ -49,27 +59,38 @@
       --lib: #8fb8dc;
       --lib-soft: #1c2f42;
       --panel: #171d25;
+      --code-bg: #0a0d12;
+      --code-text: #d7dee6;
       --ok: #6fbf8b;
       --warn: #e0a35f;
+      --ex: #ffa45c;
+      --ex-strong: #ffb985;
+      --ex-soft: #2b1f15;
+      --ex-border: #5a3d25;
+      --ex-on: #1c1209;
+      --ex-shadow: rgba(0, 0, 0, 0.35);
     }
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   body {
     margin: 0;
     font-family: "Segoe UI", -apple-system, Arial, sans-serif;
     background: var(--bg);
     color: var(--text);
-    line-height: 1.45;
+    line-height: 1.5;
   }
-  header {
-    background: var(--accent);
-    padding: 2rem 2rem 1.4rem;
+  header { background: var(--accent); padding: 1.4rem 0 1.2rem; }
+  header .inner { max-width: 980px; margin: 0 auto; padding: 0 1.5rem; }
+  h1 { margin: 0 0 0.25rem; font-size: 1.5rem; color: #fff; font-weight: 700; }
+  .sub { color: #cfe0ee; font-size: 0.92rem; }
+  @media (prefers-color-scheme: dark) {
+    header { background: #0f2a45; }
   }
-  header .inner { max-width: 1200px; margin: 0 auto; }
-  h1 { margin: 0 0 0.3rem; font-size: 1.6rem; color: #fff; font-weight: 700; }
-  .sub { color: #cfe0ee; font-size: 0.95rem; }
 
-  #lite-panel {
+  /* ---- Jupyter / VS Code / JupyterLite paneel (ongewijzigd) ---- */
+
+  #jupyter-panel {
     max-width: 1200px;
     margin: 1.2rem auto 0;
     padding: 0 2rem;
@@ -80,10 +101,38 @@
     border-radius: 6px;
     padding: 1rem 1.2rem;
   }
-  .panel-box p { margin: 0.3rem 0; font-size: 0.88rem; }
-  .field-row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; margin-top: 0.6rem; }
+  .panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    gap: 1rem;
+  }
+  .panel-head h3 {
+    margin: 0;
+    font-size: 1rem;
+  }
+  .panel-status {
+    font-size: 0.82rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    background: var(--chip);
+    color: var(--chip-text);
+    white-space: nowrap;
+  }
+  .panel-status.ok { background: var(--opgave-soft); color: var(--ok); }
+  .panel-status.warn { background: var(--accent-soft); color: var(--warn); }
+  .panel-body {
+    margin-top: 1rem;
+    display: grid;
+    gap: 0.9rem;
+  }
+  .panel-body.collapsed { display: none; }
+  .mode-row { display: flex; gap: 1.2rem; flex-wrap: wrap; font-size: 0.9rem; }
+  .mode-row label { display: flex; align-items: center; gap: 0.4rem; cursor: pointer; }
+  .field-row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; }
   .field-row label { font-size: 0.85rem; color: var(--muted); }
-  select, input[type=text] {
+  input[type=text], input[type=url] {
     padding: 0.4rem 0.6rem;
     border: 1px solid var(--border);
     border-radius: 4px;
@@ -91,123 +140,202 @@
     color: var(--text);
     font-size: 0.88rem;
   }
+  select {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--card);
+    color: var(--text);
+    font-size: 0.88rem;
+  }
+  #baseUrlInput { min-width: 220px; }
+  #tokenInput { min-width: 160px; }
+  button.btn {
+    padding: 0.42rem 0.8rem;
+    border-radius: 3px;
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  button.btn.secondary {
+    background: transparent;
+    color: var(--accent);
+  }
+  code.cmd {
+    display: block;
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 0.6rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .cmd-row { position: relative; }
+  .cmd-row button {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+    font-size: 0.72rem;
+    padding: 0.2rem 0.5rem;
+  }
   .hint { font-size: 0.8rem; color: var(--muted); }
+  #jupyter-panel, #lite-panel { max-width: 980px; margin: 1rem auto 0; padding: 0 1.5rem; }
+  .panel-box p { margin: 0.3rem 0; font-size: 0.88rem; }
 
+  /* ---- zoeken + tabs ---- */
+  #search-wrap { max-width: 980px; margin: 1rem auto 0; padding: 0 1.5rem; }
   #search {
     width: 100%;
-    max-width: 1200px;
-    margin: 1.2rem auto 0;
-    display: block;
-    padding: 0.6rem 0.9rem;
-    font-size: 0.95rem;
+    padding: 0.7rem 1rem;
+    font-size: 1rem;
     border: 1px solid var(--border);
-    border-radius: 4px;
+    border-radius: 8px;
     background: var(--card);
     color: var(--text);
   }
-  .tabs {
-    max-width: 1200px;
-    margin: 1.2rem auto 0;
-    padding: 0 2rem;
-    display: flex;
-    gap: 0.5rem;
-  }
+  #search:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .tabbar { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 0.8rem 0 0.6rem; margin-top: 0.3rem; }
+  .tabs { max-width: 980px; margin: 0 auto; padding: 0 1.5rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
   .tab {
-    padding: 0.5rem 1.1rem;
-    border-radius: 4px;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 0.05rem;
+    padding: 0.55rem 0.9rem;
     border: 1px solid var(--border);
     background: var(--card);
     color: var(--text);
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 0.95rem;
+    font: inherit;
+    text-align: left;
   }
-  .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-  main { max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
+  .tab .t-main { font-weight: 700; font-size: 0.98rem; }
+  .tab .t-sub { font-size: 0.78rem; color: var(--muted); }
+  .tab:hover { border-color: var(--accent); }
+  .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tab.active .t-sub { color: #cfe0ee; }
+  @media (prefers-color-scheme: dark) { .tab.active { color: #0b1117; } .tab.active .t-sub { color: #17324d; } }
+  @media (max-width: 640px) { .tabs { grid-template-columns: repeat(2, 1fr); } }
+
+  main, #results { max-width: 980px; margin: 0 auto; padding: 1rem 1.5rem 3rem; }
   .deel { display: none; }
   .deel.active { display: block; }
-  section.group { margin-bottom: 2.2rem; }
-  section.group h2 {
-    font-size: 1.05rem;
-    margin: 0 0 0.7rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    font-weight: 600;
-  }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 0.7rem; }
+  .deel-head { margin: 0.2rem 0 1.4rem; }
+  .deel-head h2 { margin: 0; font-size: 1.4rem; }
+  .deel-head p { margin: 0.2rem 0 0.6rem; color: var(--muted); }
+  .stats { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .stat { font-size: 0.78rem; padding: 0.15rem 0.65rem; border-radius: 999px; background: var(--chip); color: var(--chip-text); }
+  .stat.ex { background: var(--ex-soft); color: var(--ex-strong); border: 1px solid var(--ex-border); }
 
-  .card {
-    display: block;
-    padding: 0.75rem 0.9rem;
+  /* ---- "Tijdens de les": oefeningen bij de slides ---- */
+  .slides-box { margin: 0 0 1.9rem; }
+  .box-title { margin: 0 0 0.2rem; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ex-strong); font-weight: 800; }
+
+  /* ---- de route: genummerde stappen met een lijn ertussen ---- */
+  details.step { position: relative; padding-left: 3.1rem; margin: 0 0 0.5rem; }
+  details.step::before {
+    content: ""; position: absolute; left: 1.05rem; top: 2.4rem; bottom: -0.8rem; width: 2px; background: var(--border);
+  }
+  details.step:last-of-type::before { display: none; }
+  summary.step-head {
+    list-style: none; display: flex; align-items: flex-start; gap: 0.8rem; cursor: pointer;
+    padding: 0 0 0.6rem; position: relative; user-select: none;
+  }
+  summary.step-head::-webkit-details-marker { display: none; }
+  .step-num {
+    position: absolute; left: -3.1rem; top: 0;
+    width: 2.2rem; height: 2.2rem; border-radius: 50%;
+    background: var(--accent); color: #fff; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 0 4px var(--bg);
+  }
+  @media (prefers-color-scheme: dark) { .step-num { color: #0b1117; } }
+  .step-text { flex: 1; min-width: 0; padding-top: 0.05rem; }
+  .step-title { display: block; font-size: 1.15rem; font-weight: 700; line-height: 1.25; }
+  .step-blurb { display: block; font-size: 0.88rem; color: var(--muted); margin-top: 0.1rem; }
+  .step-meta { font-size: 0.78rem; color: var(--muted); white-space: nowrap; padding-top: 0.25rem; }
+  summary.step-head::after { content: "▾"; color: var(--muted); padding-top: 0.1rem; transition: transform 0.15s; }
+  details.step:not([open]) summary.step-head::after { transform: rotate(-90deg); }
+  details.step:not([open]) summary.step-head { padding-bottom: 1.2rem; }
+  @media (max-width: 560px) {
+    details.step { padding-left: 2.6rem; }
+    details.step::before { left: 0.85rem; }
+    .step-num { left: -2.6rem; width: 1.9rem; height: 1.9rem; font-size: 0.9rem; }
+    .step-meta { display: none; }
+    .step-title { font-size: 1.05rem; }
+  }
+  .step-body { padding-bottom: 0.9rem; }
+  .no-ex { font-size: 0.82rem; color: var(--muted); font-style: italic; padding: 0.1rem 0.2rem 0.4rem; }
+
+  /* ---- notebooks: rustige rijen ---- */
+  .topic {
+    position: relative;
+    display: grid; grid-template-columns: 4.4rem 1fr; gap: 0.15rem 0.8rem;
+    padding: 0.65rem 0.9rem;
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 6px;
-    transition: border-color 0.15s, transform 0.1s;
+    border-radius: 8px;
+    margin-bottom: 0.4rem;
+    transition: border-color 0.12s, box-shadow 0.12s;
   }
-  .card:hover { border-color: var(--accent); transform: translateY(-1px); }
-  .card .code {
-    font-weight: 700;
-    color: var(--accent);
-    font-size: 0.82rem;
+  .topic:hover { border-color: var(--accent); box-shadow: 0 1px 6px rgba(0, 64, 112, 0.14); }
+  .topic .code {
+    font-weight: 700; font-size: 0.8rem; color: var(--accent); background: var(--accent-soft);
+    border-radius: 6px; padding: 0.1rem 0.3rem; align-self: start; text-align: center; margin-top: 0.12rem;
   }
-  .card a.opentitle {
-    color: var(--text);
-    text-decoration: none;
-    font-size: 0.95rem;
-    font-weight: 600;
-    display: block;
-    margin: 0.15rem 0 0.35rem;
-  }
-  .card a.opentitle:hover { text-decoration: underline; }
-  .card .subject {
-    font-size: 0.82rem;
-    color: var(--muted);
-    margin-bottom: 0.45rem;
-  }
-  .chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
-  .chip {
-    font-size: 0.72rem;
-    padding: 0.12rem 0.5rem;
-    border-radius: 3px;
-    background: var(--chip);
-    color: var(--chip-text);
-  }
+  a.opentitle { color: var(--text); text-decoration: none; font-weight: 600; font-size: 1rem; }
+  a.opentitle::after { content: ""; position: absolute; inset: 0; border-radius: 8px; }   /* hele rij klikbaar */
+  .topic:hover a.opentitle { color: var(--accent); text-decoration: underline; }
+  .topic .subject { color: var(--muted); font-size: 0.85rem; margin-top: 0.05rem; }
+  .chips { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.35rem; }
+  .chip { font-size: 0.72rem; padding: 0.1rem 0.5rem; border-radius: 4px; background: var(--chip); color: var(--chip-text); }
   .chip.lib { background: var(--lib-soft); color: var(--lib); }
+  @media (max-width: 560px) { .topic { grid-template-columns: 1fr; } .topic .code { justify-self: start; padding: 0.1rem 0.5rem; } }
 
+  /* ---- oefeningen: opvallende callouts ---- */
   .exercise {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0.8rem 1rem;
-    margin-bottom: 0.6rem;
+    position: relative;
+    margin: 0.8rem 0 1.1rem;
+    padding: 1rem 1.25rem 1.1rem;
+    background: var(--ex-soft);
+    border: 1px solid var(--ex-border);
+    border-left: 6px solid var(--ex);
+    border-radius: 10px;
+    box-shadow: 0 2px 10px var(--ex-shadow);
   }
-  .exercise .top-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 0.6rem;
-    flex-wrap: wrap;
+  .ex-top { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.3rem; }
+  .ex-badge {
+    font-size: 0.7rem; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--ex-on); background: var(--ex); padding: 0.14rem 0.55rem; border-radius: 4px;
   }
-  .exercise .code { font-weight: 700; color: var(--accent); font-size: 0.82rem; }
-  .exercise .title { font-weight: 600; font-size: 0.98rem; }
-  .exercise .desc { font-size: 0.85rem; color: var(--muted); margin: 0.3rem 0 0.5rem; }
-  .exercise .covers { font-size: 0.8rem; margin-bottom: 0.5rem; }
-  .exercise .covers .label { color: var(--muted); margin-right: 0.3rem; }
-  .exercise .buttons { display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
-  .exercise a.opgave, .exercise a.oplossing {
-    text-decoration: none;
-    font-size: 0.82rem;
-    padding: 0.3rem 0.7rem;
-    border-radius: 3px;
-    font-weight: 600;
+  .ex-kind { font-size: 0.78rem; font-weight: 600; color: var(--ex-strong); }
+  .ex-code { margin-left: auto; font-weight: 700; font-size: 0.85rem; color: var(--ex-strong); }
+  .ex-title { font-size: 1.12rem; font-weight: 700; margin: 0.1rem 0 0.3rem; }
+  .exercise .desc { font-size: 0.9rem; margin: 0 0 0.55rem; }
+  .exercise .covers { font-size: 0.8rem; color: var(--muted); display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; margin-bottom: 0.3rem; }
+  .exercise .covers .label { margin-right: 0.1rem; }
+  .exercise .chip { background: rgba(194, 87, 12, 0.1); color: var(--ex-strong); }
+  .exercise .chip.lib { background: var(--lib-soft); color: var(--lib); }
+  .btns { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.75rem; align-items: center; }
+  .btns a {
+    text-decoration: none; font-weight: 700; font-size: 0.9rem; padding: 0.45rem 1.1rem;
+    border-radius: 6px; border: 2px solid var(--ex); display: inline-block;
   }
-  a.opgave { background: var(--accent-soft); color: var(--accent); }
-  a.oplossing { background: var(--opgave-soft); color: var(--opgave); }
-  .no-oplossing { font-size: 0.78rem; color: var(--muted); font-style: italic; padding: 0.3rem 0; }
+  a.btn-opgave { background: var(--ex); color: var(--ex-on); }
+  a.btn-opgave:hover { background: var(--ex-strong); border-color: var(--ex-strong); color: #fff; }
+  a.btn-oplossing { background: transparent; color: var(--ex-strong); }
+  a.btn-oplossing:hover { background: var(--ex); color: var(--ex-on); }
+  .no-oplossing { font-size: 0.8rem; color: var(--muted); font-style: italic; }
 
-  .hidden { display: none !important; }
+  /* ---- zoekresultaten ---- */
+  .results-head { font-size: 0.9rem; color: var(--muted); margin: 0 0 0.4rem; }
+  .crumb { font-size: 0.74rem; color: var(--muted); margin: 1rem 0 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
   .empty-msg { color: var(--muted); font-style: italic; padding: 1rem 0; }
-  footer { max-width: 1200px; margin: 0 auto; padding: 0 2rem 3rem; color: var(--muted); font-size: 0.8rem; }
+
+  a.needs-path, a.needs-token { opacity: 0.5; cursor: not-allowed; }
+  footer { max-width: 980px; margin: 0 auto; padding: 0 1.5rem 3rem; color: var(--muted); font-size: 0.8rem; }
+
 </style>
 </head>
 <body>
@@ -215,7 +343,7 @@
 <header>
   <div class="inner">
   <h1>SOEP1 — Cursusmateriaal (in de browser, geen installatie nodig)</h1>
-  <div class="sub">Volledige index van Deel 1, Deel 2 en Deel 3. Notebooks openen en draaien hier rechtstreeks in JupyterLite — je hoeft niets te installeren.</div>
+  <div class="sub">Kies een deel, volg de stappen van boven naar onder en maak de oefeningen. Notebooks draaien rechtstreeks in JupyterLite.</div>
   </div>
 </header>
 
@@ -233,141 +361,198 @@
   </div>
 </div>
 
-<input id="search" type="text" placeholder="Zoek op onderwerp, bibliotheek, hoofdstuk of oefening (bv. 'recursie', 'pandas', 'dictionary')...">
 
-<div class="tabs">
-  <div class="tab active" data-target="deel1">Deel 1</div>
-  <div class="tab" data-target="deel2">Deel 2</div>
-  <div class="tab" data-target="deel3">Deel 3</div>
+<div id="search-wrap">
+  <input id="search" type="text" placeholder="Zoek op onderwerp, bibliotheek, hoofdstuk of oefening (bv. 'recursie', 'pandas', 'dictionary')..." autocomplete="off">
 </div>
 
+<div class="tabbar" id="tabbar"><nav class="tabs" id="tabs" aria-label="Delen"></nav></div>
+
 <main id="main"></main>
+<section id="results" hidden></section>
 
 <footer>
+  Blauwe rijen zijn <strong>notebooks</strong> om door te nemen; de oranje blokken zijn <strong>oefeningen</strong> (opgave en oplossing). Werk elk deel van boven naar onder af.<br>
   Gegenereerd op basis van de markdown-headers, imports en functiedefinities in elke notebook. "Dekt" bij oefeningen is een inhoudelijke inschatting op basis van gebruikte concepten, geen officiële leerplanmapping.<br>
   Liever lokaal werken met je eigen Anaconda-installatie en VS Code? Gebruik dan <code>index.html</code> uit de cursusmap in plaats van deze pagina.
 </footer>
 
-<!-- Same precomputed TF-IDF search index as the local index.html — see build_search_index.py. -->
+<!-- Vooraf berekende TF-IDF-zoekindex over de inhoud van de notebooks (build_search_index.py), apart bestand
+     zodat het ook via <script src> laadt: fetch() op een lokaal bestand is onbetrouwbaar bij file://. -->
 <script src="search-index.js"></script>
 <script>
-/* ================= DATA ================= */
-/* Identical to index.html's DATA — keep both files in sync when notebooks change. */
+/* ================= DATA =================
+   Per deel: een optionele lijst "slideExercises" (oefeningen bij de slides) en een lijst "steps".
+   Elke stap bevat "items" in de volgorde waarin een student ze doorloopt: eerst de notebooks (met "path"),
+   dan de bijhorende oefening(en) (met "opgave"/"oplossing" of "notebook").
+   "kind" van een oefening: slides | debug | examen | oefening. */
 const DATA = {
-  1: {
-    groups: [
-      {
-        label: "Deel A",
-        slideExercises: [
-          {code:"1A", title:"Oefeningen op de slides", opgave:"Deel 1 - syntax/1A-oefeningen_slides.ipynb", oplossing:"Deel 1 - syntax/1A-oefeningen_slides-oplossing.ipynb",
-           desc:"Korte herhalingsoefeningen per hoofdstuk, rechtstreeks aansluitend bij de slides (1.1 t/m 1.12) — o.a. functies met standaardargumenten (dubbel, verhoog), een kwadraat-functie en een kleine class Info.", covers:["1A.1 t/m 1A.12"], libs:["math"]},
-        ],
-        topics: [
-          {code:"1A.1", title:"Basis data types", path:"Deel 1 - syntax/Deel A/1A.1-basis_data_types.ipynb", subject:"Integers, floats, booleans, strings, dynamische typering, type-conversies", libs:[]},
-          {code:"1A.2", title:"Variabelen", path:"Deel 1 - syntax/Deel A/1A.2-variabelen.ipynb", subject:"Toewijzing, geheugenreferenties, wat gebeurt er achter de schermen bij a = b", libs:[]},
-          {code:"1A.3", title:"Sets", path:"Deel 1 - syntax/Deel A/1A.3-sets.ipynb", subject:"Verzamelingen, unieke elementen, add()-methode, verzamelingsoperaties", libs:[]},
-          {code:"1A.4", title:"Lijsten", path:"Deel 1 - syntax/Deel A/1A.4-lijsten.ipynb", subject:"Indexering, lijsten manipuleren, lijsten-in-lijsten, deep copy, tuples", libs:["copy"]},
-          {code:"1A.5", title:"Dictionaries", path:"Deel 1 - syntax/Deel A/1A.5-dictionaries.ipynb", subject:"Key-value paren, veilig opvragen (get/in/len), keys()/values()/items(), shallow vs. deep copy", libs:["copy"]},
-          {code:"1A.6", title:"Operatoren", path:"Deel 1 - syntax/Deel A/1A.6-operatoren.ipynb", subject:"Rekenkundige, vergelijkende, logische en gelijkheidsoperatoren, volgorde van bewerkingen", libs:[]},
-          {code:"1A.7", title:"Conditionals", path:"Deel 1 - syntax/Deel A/1A.7-conditionals.ipynb", subject:"if/elif/else, indents, geneste if-statements, logische operatoren", libs:[]},
-          {code:"1A.8", title:"Iteraties", path:"Deel 1 - syntax/Deel A/1A.8-iteraties.ipynb", subject:"while-lussen, for-lussen, break en continue", libs:[]},
-          {code:"1A.9", title:"Comprehensions", path:"Deel 1 - syntax/Deel A/1A.9-comprehensions.ipynb", subject:"Lijst-, set- en dictionary comprehensions als kortere notatie om collecties op te bouwen", libs:[]},
-          {code:"1A.10", title:"Strings", path:"Deel 1 - syntax/Deel A/1A.10-strings.ipynb", subject:"Strings als itereerbare objecten, stringmethodes (capitalize/lower/upper/find/replace/split), printen, input()", libs:[]},
-          {code:"1A.11", title:"Functies", path:"Deel 1 - syntax/Deel A/1A.11-functies.ipynb", subject:"Scope, deep copy, return-waarden, argumenten", libs:[]},
-          {code:"1A.12", title:"Filter- en mapfuncties", path:"Deel 1 - syntax/Deel A/1A.12-filter_map_functies.ipynb", subject:"filter() en map() met eigen functies en lambda's", libs:[]},
-          {code:"1A.13", title:"Objecten", path:"Deel 1 - syntax/Deel A/1A.13-objecten.ipynb", subject:"Classes, __init__, methodes, self, object-geörienteerd programmeren", libs:[]},
-          {code:"1A.14", title:"Modules", path:"Deel 1 - syntax/Deel A/1A.14-modules.ipynb", subject:"Externe modules importeren, dir(), selectief importeren", libs:["math","numpy","time"]},
-          {code:"1A.15", title:"Errors / Debuggen", path:"Deel 1 - syntax/Deel A/1A.15-fouten_debuggen.ipynb", subject:"10 veelvoorkomende foutmeldingen: Syntax, Indentation, ZeroDivision, Name, Value, Key, Index, Attribute, Type, Overflow", libs:["math"]},
-        ],
-        exercises: [
-          {code:"1a", title:"Datastructuren — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel A/Oefeningen/1A.a-datastructuren-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel A/Oefeningen/1A.a-datastructuren-debug-oplossing.ipynb",
-           desc:"9 bewust foute codefragmenten herstellen rond dictionaries, sets, tuples en lijsten (bv. KeyError bij tellen, dict aanpassen tijdens iteratie, tuple muteren).", covers:["1A.3 Sets","1A.4 Lijsten","1A.5 Dictionaries"], libs:[]},
-          {code:"1b", title:"Controlestroom — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel A/Oefeningen/1A.b-control_flow-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel A/Oefeningen/1A.b-control_flow-debug-oplossing.ipynb",
-           desc:"13 debug-fragmenten rond lussen, operatoren en indexering (off-by-one, oneindige lus, hergebruikte lusvariabele, break vs. continue, enumerate-verwarring).", covers:["1A.6 Operatoren","1A.7 Conditionals","1A.8 Iteraties"], libs:[]},
-          {code:"1c", title:"Functies en comprehensions — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel A/Oefeningen/1A.c-functies_comprehensions-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel A/Oefeningen/1A.c-functies_comprehensions-debug-oplossing.ipynb",
-           desc:"7 debug-fragmenten rond functies en comprehensions (vergeten return, mutable default argument, botsende sleutels, filter() zonder list()).", covers:["1A.9 Comprehensions","1A.11 Functies","1A.12 Filter- en mapfuncties"], libs:[]},
-          {code:"1d", title:"Voorbeeld examenvragen — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel A/Oefeningen/1A.d-voorbeeld_examenvragen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel A/Oefeningen/1A.d-voorbeeld_examenvragen-debug-oplossing.ipynb",
-           desc:"Examenstijl debug-oefeningen op (bijna) volledige functies: is_anagram, vertaal_naar_binair, controleer_aandelen, bereken_factuur, bereken_overuren.", covers:["1A.10 Strings","1A.11 Functies"], libs:["numpy"]},
-        ]
-      },
-      {
-        label: "Deel B",
-        slideExercises: [
-          {code:"1B", title:"Oefeningen op de slides", opgave:"Deel 1 - syntax/1B-oefeningen_slides.ipynb", oplossing:"Deel 1 - syntax/1B-oefeningen_slides-oplossing.ipynb",
-           desc:"Korte herstel-oefeningen (VERBETER) per slide-hoofdstuk 1B.1 t/m 1B.8: NumPy (arrays aanmaken, indexeren, rekenen, hervormen/sorteren, filteren/np.where, kopieën) en Pandas (Series, DataFrame, filteren, groupby, drop, apply).", covers:["1B.1 NumPy","1B.2 Pandas","1B.3 Pandas — werken met echte data","1B.5 Marketing"], libs:["numpy","pandas"]},
-        ],
-        topics: [
-          {code:"1B.1", title:"NumPy", path:"Deel 1 - syntax/Deel B/1B.1-NumPy.ipynb", subject:"Arrays aanmaken, berekeningen en snelheid t.o.v. lijsten, statistieken, matrixoperaties, hervormen/samenvoegen, sorteren, filteren", libs:["numpy","time"]},
-          {code:"1B.1", title:"Voorbeeld: intrestberekening", path:"Deel 1 - syntax/Deel B/1B.1-voorbeeld-intrestberekening.ipynb", subject:"Amortisatietabel van een lening opbouwen met een NumPy-matrix (maandbedrag, intrest, kapitaalaflossing)", libs:["numpy","matplotlib"]},
-          {code:"1B.2", title:"Pandas", path:"Deel 1 - syntax/Deel B/1B.2-pandas.ipynb", subject:"Series en DataFrame, hun aanmaak en basisgebruik", libs:["numpy","pandas"]},
-          {code:"1B.3", title:"Pandas — werken met echte data", path:"Deel 1 - syntax/Deel B/1B.3-pandas-data.ipynb", subject:"Een echte dataset (COVID-19-cijfers) inlezen, kolommen, rijen doorlopen, filteren, sorteren/groeperen, ontbrekende waarden, grafieken, wegschrijven", libs:["numpy","pandas","matplotlib"]},
-          {code:"1B.4", title:"Pandas — use cases", path:"Deel 1 - syntax/Deel B/1B.4-pandas-cases.ipynb", subject:"3 toegepaste cases, o.a. omgaan met ontbrekende (NaN) data via dropna()", libs:["numpy","pandas"]},
-          {code:"1B.5", title:"Marketing", path:"Deel 1 - syntax/Deel B/1B.5-marketing_voorbeelden.ipynb", subject:"Klantengegevens simuleren, marketingacties toewijzen, Customer Lifetime Value berekenen, klanten filteren en visualiseren", libs:["numpy","pandas","matplotlib"]},
-        ],
-        exercises: [
-          {code:"1B.1", title:"Debug oefeningen — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel B/Oefeningen/1B.1-oefeningen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen/1B.1-oefeningen-debug-oplossing.ipynb",
-           desc:"3 korte NumPy-functies met telkens één bug (rij_sommen: axis-verwarring, tel_boven_grens, binnenmatrix).", covers:["1B.1 NumPy"], libs:["numpy"]},
-          {code:"1B.1", title:"Oefeningen — deel 1", opgave:"Deel 1 - syntax/Deel B/Oefeningen/1B.1-start_oefeningen_deel_1-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen/1B.1-start_oefeningen_deel_1-oplossing.ipynb",
-           desc:"Basisoefeningen NumPy-syntax: een 6x6-sudoku als array (5 vragen) en een puntenanalyse-opdracht (5 vragen).", covers:["1B.1 NumPy"], libs:["numpy"]},
-          {code:"1B.1", title:"Voorbeeld examenvragen — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel B/Oefeningen/1B.1-voorbeeld_examenvragen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen/1B.1-voorbeeld_examenvragen-debug-oplossing.ipynb",
-           desc:"Examenstijl NumPy-debug: matrixeigenschappen controleren (vierkant + diagonaal, met is i.p.v. ==) en matrices vermenigvuldigen.", covers:["1B.1 NumPy"], libs:["numpy"]},
-          {code:"1B.2", title:"Debug oefeningen — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel B/Oefeningen/1B.2-oefeningen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen/1B.2-oefeningen-debug-oplossing.ipynb",
-           desc:"3 korte Pandas-functies met telkens één bug (haal_geslaagden: >= vs. >, gemiddelde_per_klas, tel_categorie).", covers:["1B.2 Pandas"], libs:["pandas"]},
-          {code:"1B.2", title:"Oefeningen — deel 1", opgave:null, oplossing:"Deel 1 - syntax/Deel B/Oefeningen/1B.2-start_oefeningen_deel1-oplossing.ipynb",
-           desc:"Oefeningen op verkeersongevallendata (Statbel, 2020) en studentenscores — enkel de oplossing is beschikbaar, geen apart opgavebestand.", covers:["1B.2 Pandas","1B.3 Pandas — werken met echte data"], libs:["numpy","pandas"]},
-          {code:"1B.2", title:"Voorbeeld examenvragen — lees, voorspel, verbeter", opgave:"Deel 1 - syntax/Deel B/Oefeningen/1B.2-voorbeeld_examenvragen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen/1B.2-voorbeeld_examenvragen-debug-oplossing.ipynb",
-           desc:"Examenstijl Pandas/NumPy-debug: axis-verwarring bij sum() die een IndexingError veroorzaakt, plus 3 verdere vragen.", covers:["1B.2 Pandas","1B.3 Pandas — werken met echte data"], libs:["numpy","pandas"]},
-        ]
-      }
+  "1A": {
+    label: "Deel 1A", name: "Basis-syntax",
+    intro: "Python vanaf nul: data types, datastructuren, controlestroom, functies en objecten.",
+    slideExercises: [
+      {code:"1A", title:"Oefeningen op de slides", kind:"slides",
+       opgave:"Deel 1 - syntax/1A-oefeningen_slides.ipynb", oplossing:"Deel 1 - syntax/1A-oefeningen_slides-oplossing.ipynb",
+       desc:"Korte herhalingsoefeningen per hoofdstuk, rechtstreeks aansluitend bij de slides (1.1 t/m 1.12) — o.a. functies met standaardargumenten (dubbel, verhoog), een kwadraat-functie en een kleine class Info.",
+       covers:["1A.1 t/m 1A.12"], libs:["math"]},
+    ],
+    steps: [
+      {title:"Basis", blurb:"Waarden, types en variabelen: de bouwstenen van elk programma.", items:[
+        {code:"1A.1", title:"Basis data types", path:"Deel 1 - syntax/Deel A/1A.1-basis_data_types.ipynb", subject:"Integers, floats, booleans, strings, dynamische typering, type-conversies", libs:[]},
+        {code:"1A.2", title:"Variabelen", path:"Deel 1 - syntax/Deel A/1A.2-variabelen.ipynb", subject:"Toewijzing, geheugenreferenties, wat gebeurt er achter de schermen bij a = b", libs:[]},
+      ]},
+      {title:"Datastructuren", blurb:"Verzamelingen, lijsten en dictionaries.", items:[
+        {code:"1A.3", title:"Sets", path:"Deel 1 - syntax/Deel A/1A.3-sets.ipynb", subject:"Verzamelingen, unieke elementen, add()-methode, verzamelingsoperaties", libs:[]},
+        {code:"1A.4", title:"Lijsten", path:"Deel 1 - syntax/Deel A/1A.4-lijsten.ipynb", subject:"Indexering, lijsten manipuleren, lijsten-in-lijsten, deep copy, tuples", libs:["copy"]},
+        {code:"1A.5", title:"Dictionaries", path:"Deel 1 - syntax/Deel A/1A.5-dictionaries.ipynb", subject:"Key-value paren, veilig opvragen (get/in/len), keys()/values()/items(), shallow vs. deep copy", libs:["copy"]},
+        {code:"1a", title:"Datastructuren — lees, voorspel, verbeter", kind:"debug",
+         opgave:"Deel 1 - syntax/Deel A/Oefeningen/1A.a-datastructuren-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel A/Oefeningen/1A.a-datastructuren-debug-oplossing.ipynb",
+         desc:"9 bewust foute codefragmenten herstellen rond dictionaries, sets, tuples en lijsten (bv. KeyError bij tellen, dict aanpassen tijdens iteratie, tuple muteren).",
+         covers:["1A.3 Sets","1A.4 Lijsten","1A.5 Dictionaries"], libs:[]},
+      ]},
+      {title:"Controlestroom", blurb:"Operatoren, beslissingen en herhalingen.", items:[
+        {code:"1A.6", title:"Operatoren", path:"Deel 1 - syntax/Deel A/1A.6-operatoren.ipynb", subject:"Rekenkundige, vergelijkende, logische en gelijkheidsoperatoren, volgorde van bewerkingen", libs:[]},
+        {code:"1A.7", title:"Conditionals", path:"Deel 1 - syntax/Deel A/1A.7-conditionals.ipynb", subject:"if/elif/else, indents, geneste if-statements, logische operatoren", libs:[]},
+        {code:"1A.8", title:"Iteraties", path:"Deel 1 - syntax/Deel A/1A.8-iteraties.ipynb", subject:"while-lussen, for-lussen, break en continue", libs:[]},
+        {code:"1b", title:"Controlestroom — lees, voorspel, verbeter", kind:"debug",
+         opgave:"Deel 1 - syntax/Deel A/Oefeningen/1A.b-control_flow-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel A/Oefeningen/1A.b-control_flow-debug-oplossing.ipynb",
+         desc:"13 debug-fragmenten rond lussen, operatoren en indexering (off-by-one, oneindige lus, hergebruikte lusvariabele, break vs. continue, enumerate-verwarring).",
+         covers:["1A.6 Operatoren","1A.7 Conditionals","1A.8 Iteraties"], libs:[]},
+      ]},
+      {title:"Comprehensions, strings en functies", blurb:"Collecties compact opbouwen, tekst bewerken en code hergebruiken.", items:[
+        {code:"1A.9", title:"Comprehensions", path:"Deel 1 - syntax/Deel A/1A.9-comprehensions.ipynb", subject:"Lijst-, set- en dictionary comprehensions als kortere notatie om collecties op te bouwen", libs:[]},
+        {code:"1A.10", title:"Strings", path:"Deel 1 - syntax/Deel A/1A.10-strings.ipynb", subject:"Strings als itereerbare objecten, stringmethodes (capitalize/lower/upper/find/replace/split), printen, input()", libs:[]},
+        {code:"1A.11", title:"Functies", path:"Deel 1 - syntax/Deel A/1A.11-functies.ipynb", subject:"Scope, deep copy, return-waarden, argumenten", libs:[]},
+        {code:"1A.12", title:"Filter- en mapfuncties", path:"Deel 1 - syntax/Deel A/1A.12-filter_map_functies.ipynb", subject:"filter() en map() met eigen functies en lambda's", libs:[]},
+        {code:"1c", title:"Functies en comprehensions — lees, voorspel, verbeter", kind:"debug",
+         opgave:"Deel 1 - syntax/Deel A/Oefeningen/1A.c-functies_comprehensions-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel A/Oefeningen/1A.c-functies_comprehensions-debug-oplossing.ipynb",
+         desc:"7 debug-fragmenten rond functies en comprehensions (vergeten return, mutable default argument, botsende sleutels, filter() zonder list()).",
+         covers:["1A.9 Comprehensions","1A.11 Functies","1A.12 Filter- en mapfuncties"], libs:[]},
+      ]},
+      {title:"Objecten, modules en foutmeldingen", blurb:"Eigen classes, externe bibliotheken en leren lezen van foutmeldingen.", items:[
+        {code:"1A.13", title:"Objecten", path:"Deel 1 - syntax/Deel A/1A.13-objecten.ipynb", subject:"Classes, __init__, methodes, self, object-geörienteerd programmeren", libs:[]},
+        {code:"1A.14", title:"Modules", path:"Deel 1 - syntax/Deel A/1A.14-modules.ipynb", subject:"Externe modules importeren, dir(), selectief importeren", libs:["math","numpy","time"]},
+        {code:"1A.15", title:"Errors / Debuggen", path:"Deel 1 - syntax/Deel A/1A.15-fouten_debuggen.ipynb", subject:"10 veelvoorkomende foutmeldingen: Syntax, Indentation, ZeroDivision, Name, Value, Key, Index, Attribute, Type, Overflow", libs:["math"]},
+      ]},
+      {title:"Examenstijl oefenen", blurb:"Bijna-volledige oplossingen met een of meer bugs, zoals op het examen.", items:[
+        {code:"1d", title:"Voorbeeld examenvragen — lees, voorspel, verbeter", kind:"examen",
+         opgave:"Deel 1 - syntax/Deel A/Oefeningen/1A.d-voorbeeld_examenvragen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel A/Oefeningen/1A.d-voorbeeld_examenvragen-debug-oplossing.ipynb",
+         desc:"Examenstijl debug-oefeningen op (bijna) volledige functies: is_anagram, vertaal_naar_binair, controleer_aandelen, bereken_factuur, bereken_overuren.",
+         covers:["1A.10 Strings","1A.11 Functies"], libs:["numpy"]},
+      ]},
     ]
   },
-  2: {
-    groups: [
-      {
-        label: null,
-        topics: [
-          {code:"2A.0", title:"Voorbeeld: 24-urenloop", path:"Deel 2 - algoritmes/2A.0-voorbeeld_24urenloop.ipynb", subject:"Monte Carlo-simulatie van een 24-uursestafette tussen vier studententeams: rondetijden simuleren, races draaien, resultaten samenvatten en plotten", libs:["numpy","pandas","matplotlib","json","os","typing"]},
-          {code:"2A.1", title:"Zoekfuncties", path:"Deel 2 - algoritmes/2A.1-zoekfuncties.ipynb", subject:"De laagste getallen in een lijst zoeken, omgaan met grensgevallen", libs:[]},
-          {code:"2A.2", title:"Bewijs van het tegendeel", path:"Deel 2 - algoritmes/2A.2-bewijs_tegendeel.ipynb", subject:"Vroegtijdig stoppen: symmetrie van een matrix, gesorteerde rij, identieke rijen controleren", libs:[]},
-          {code:"2A.3", title:"Soorten algoritmes", path:"Deel 2 - algoritmes/2A.3-soorten_algoritmes.ipynb", subject:"Algoritme-strategieën: greedy/gulzige algoritmes, benaderingsalgoritmes, probabilistische en iteratieve verbeteringsalgoritmes", libs:["numpy"]},
-          {code:"2B.1", title:"Recursie", path:"Deel 2 - algoritmes/2B.1-recursie.ipynb", subject:"Faculteit, maximum bepalen, rij van Fibonacci, Torens van Hanoi", libs:["time"]},
-          {code:"2B.1", title:"Voorbeelden", path:"Deel 2 - algoritmes/2B.1-voorbeelden.ipynb", subject:"Uitgewerkte voorbeeldoefeningen bij recursie: aftellen tot 0, som van een reeks via verdeel-en-heers, en een derde voorbeeld", libs:[]},
-          {code:"2B.2", title:"Backtracking", path:"Deel 2 - algoritmes/2B.2-backtracking.ipynb", subject:"Recursieve backtracking via een zoekboom: paardensprong (Knight's tour), Sudoku oplossen", libs:[]},
-          {code:"2B.2", title:"Voorbeeld: Dammen", path:"Deel 2 - algoritmes/2B.2-voorbeeld_dammen.ipynb", subject:"Backtracking toegepast op een dammenbord: zetten valideren, mogelijke zetten zoeken en het bord kopiëren", libs:[]},
-          {code:"2B.2", title:"Voorbeelden: Doolhof", path:"Deel 2 - algoritmes/2B.2-voorbeelden_doolhof.ipynb", subject:"Backtracking in een doolhof: een uitweg vinden vanaf een startpositie en het langst mogelijke pad zoeken", libs:["numpy"]},
-          {code:"2C.1", title:"Sorteren", path:"Deel 2 - algoritmes/2C.1-sorteren.ipynb", subject:"Bubble sort en merge sort (met pseudocode en implementatie)", libs:[]},
-          {code:"2C.2", title:"Complexiteit", path:"Deel 2 - algoritmes/2C.2-complexiteit.ipynb", subject:"Big-O empirisch aangetoond door looptijden van bubble sort vs. merge sort te meten", libs:["numpy","matplotlib","time"]},
-        ],
-        exercises: [
-          {code:"2.A", title:"Oefeningen en voorbeelden", notebook:"Deel 2 - algoritmes/Oefeningen/2.A-oefeningen_en_voorbeelden.ipynb",
-           desc:"Zoek de rij met de hoogste som in een matrix, met vroegtijdig stoppen via bewijs van het tegendeel; volledig uitgewerkt met zelftests (assert).", covers:["2A.1 Zoekfuncties","2A.2 Bewijs van het tegendeel"], libs:[]},
-          {code:"2B.1", title:"Recursie — lees, voorspel, verbeter", opgave:"Deel 2 - algoritmes/Oefeningen/2B.1-recursie-debug-opgave.ipynb", oplossing:"Deel 2 - algoritmes/Oefeningen/2B.1-recursie-debug-oplossing.ipynb",
-           desc:"6 debug-fragmenten rond recursie (ontbrekende basisoplossing, vergeten return, vergeten global, off-by-one, mutable default argument).", covers:["2B.1 Recursie"], libs:[]},
-          {code:"2B.2", title:"Backtracking — lees, voorspel, verbeter", opgave:"Deel 2 - algoritmes/Oefeningen/2B.2-backtracking-debug-opgave.ipynb", oplossing:"Deel 2 - algoritmes/Oefeningen/2B.2-backtracking-debug-oplossing.ipynb",
-           desc:"5 debug-fragmenten rond backtracking in een doolhof (vergeten backtracken/pop, ongebruikte return-waarde, foute grenscontrole, vergeten bezocht-check, globale lijst niet gereset).", covers:["2B.2 Backtracking","2B.2 Voorbeelden: Doolhof"], libs:[]},
-        ]
-      }
+
+  "1B": {
+    label: "Deel 1B", name: "NumPy & pandas",
+    intro: "Rekenen met matrices en werken met tabeldata.",
+    slideExercises: [
+      {code:"1B", title:"Oefeningen op de slides", kind:"slides",
+       opgave:"Deel 1 - syntax/1B-oefeningen_slides.ipynb", oplossing:"Deel 1 - syntax/1B-oefeningen_slides-oplossing.ipynb",
+       desc:"Korte herstel-oefeningen (VERBETER) per slide-hoofdstuk 1B.1 t/m 1B.8: NumPy (arrays aanmaken, indexeren, rekenen, hervormen/sorteren, filteren/np.where, kopieën) en Pandas (Series, DataFrame, filteren, groupby, drop, apply).",
+       covers:["1B.1 NumPy","1B.2 Pandas","1B.3 Pandas — werken met echte data","1B.5 Marketing"], libs:["numpy","pandas"]},
+    ],
+    steps: [
+      {title:"NumPy", blurb:"Snel rekenen met arrays en matrices.", items:[
+        {code:"1B.1", title:"NumPy", path:"Deel 1 - syntax/Deel B/1B.1-NumPy.ipynb", subject:"Arrays aanmaken, berekeningen en snelheid t.o.v. lijsten, statistieken, matrixoperaties, hervormen/samenvoegen, sorteren, filteren", libs:["numpy","time"]},
+        {code:"1B.1", title:"Voorbeeld: intrestberekening", path:"Deel 1 - syntax/Deel B/1B.1-voorbeeld-intrestberekening.ipynb", subject:"Amortisatietabel van een lening opbouwen met een NumPy-matrix (maandbedrag, intrest, kapitaalaflossing)", libs:["numpy","matplotlib"]},
+        {code:"1B.1", title:"Debug oefeningen — lees, voorspel, verbeter", kind:"debug",
+         opgave:"Deel 1 - syntax/Deel B/Oefeningen/1B.1-oefeningen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen/1B.1-oefeningen-debug-oplossing.ipynb",
+         desc:"3 korte NumPy-functies met telkens één bug (rij_sommen: axis-verwarring, tel_boven_grens, binnenmatrix).",
+         covers:["1B.1 NumPy"], libs:["numpy"]},
+        {code:"1B.1", title:"Oefeningen — deel 1", kind:"oefening",
+         opgave:"Deel 1 - syntax/Deel B/Oefeningen/1B.1-start_oefeningen_deel_1-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen/1B.1-start_oefeningen_deel_1-oplossing.ipynb",
+         desc:"Basisoefeningen NumPy-syntax: een 6x6-sudoku als array (5 vragen) en een puntenanalyse-opdracht (5 vragen).",
+         covers:["1B.1 NumPy"], libs:["numpy"]},
+        {code:"1B.1", title:"Voorbeeld examenvragen — lees, voorspel, verbeter", kind:"examen",
+         opgave:"Deel 1 - syntax/Deel B/Oefeningen/1B.1-voorbeeld_examenvragen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen/1B.1-voorbeeld_examenvragen-debug-oplossing.ipynb",
+         desc:"Examenstijl NumPy-debug: matrixeigenschappen controleren (vierkant + diagonaal, met is i.p.v. ==) en matrices vermenigvuldigen.",
+         covers:["1B.1 NumPy"], libs:["numpy"]},
+      ]},
+      {title:"Pandas", blurb:"Tabeldata inlezen, filteren, groeperen en visualiseren.", items:[
+        {code:"1B.2", title:"Pandas", path:"Deel 1 - syntax/Deel B/1B.2-pandas.ipynb", subject:"Series en DataFrame, hun aanmaak en basisgebruik", libs:["numpy","pandas"]},
+        {code:"1B.3", title:"Pandas — werken met echte data", path:"Deel 1 - syntax/Deel B/1B.3-pandas-data.ipynb", subject:"Een echte dataset (COVID-19-cijfers) inlezen, kolommen, rijen doorlopen, filteren, sorteren/groeperen, ontbrekende waarden, grafieken, wegschrijven", libs:["numpy","pandas","matplotlib"]},
+        {code:"1B.4", title:"Pandas — use cases", path:"Deel 1 - syntax/Deel B/1B.4-pandas-cases.ipynb", subject:"3 toegepaste cases, o.a. omgaan met ontbrekende (NaN) data via dropna()", libs:["numpy","pandas"]},
+        {code:"1B.2", title:"Debug oefeningen — lees, voorspel, verbeter", kind:"debug",
+         opgave:"Deel 1 - syntax/Deel B/Oefeningen/1B.2-oefeningen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen/1B.2-oefeningen-debug-oplossing.ipynb",
+         desc:"3 korte Pandas-functies met telkens één bug (haal_geslaagden: >= vs. >, gemiddelde_per_klas, tel_categorie).",
+         covers:["1B.2 Pandas"], libs:["pandas"]},
+        {code:"1B.2", title:"Oefeningen — deel 1", kind:"oefening",
+         opgave:"Deel 1 - syntax/Deel B/Oefeningen/1B.2-start_oefeningen_deel1-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen/1B.2-start_oefeningen_deel1-oplossing.ipynb",
+         desc:"Korte Pandas-oefeningen op verkeersongevallendata (Statbel, 2020; vragen 0 t/m 6) en op studentenscores (4 vragen).",
+         covers:["1B.2 Pandas","1B.3 Pandas — werken met echte data"], libs:["numpy","pandas"]},
+        {code:"1B.2", title:"Voorbeeld examenvragen — lees, voorspel, verbeter", kind:"examen",
+         opgave:"Deel 1 - syntax/Deel B/Oefeningen/1B.2-voorbeeld_examenvragen-debug-opgave.ipynb", oplossing:"Deel 1 - syntax/Deel B/Oefeningen/1B.2-voorbeeld_examenvragen-debug-oplossing.ipynb",
+         desc:"Examenstijl Pandas-debug: rijen filteren op rijsom (pandas_oefening), vragen over hartpatiënten (heart_disease_data.csv) en over een dataset met panda's (vraag_1 t/m vraag_4).",
+         covers:["1B.2 Pandas","1B.3 Pandas — werken met echte data"], libs:["numpy","pandas"]},
+      ]},
+      {title:"Toepassing: marketing", blurb:"Alles samen in een zakelijk voorbeeld.", items:[
+        {code:"1B.5", title:"Marketing", path:"Deel 1 - syntax/Deel B/1B.5-marketing_voorbeelden.ipynb", subject:"Klantengegevens simuleren, marketingacties toewijzen, Customer Lifetime Value berekenen, klanten filteren en visualiseren", libs:["numpy","pandas","matplotlib"]},
+      ]},
     ]
   },
-  3: {
-    groups: [
-      {
-        label: null,
-        topics: [
-          {code:"3A", title:"Een language model gebouwd in NumPy", path:"Deel 3 - toepassingen/3A-mini-LLM-in_numpy.ipynb", subject:"Klein taalmodel op basis van de Transformer-architectuur, volledig in NumPy (tokenisatie, attention, softmax, training)", libs:["numpy"]},
-          {code:"3B", title:"PageRank", path:"Deel 3 - toepassingen/3B-PageRank.ipynb", subject:"Het PageRank-algoritme (Google) toegepast op een webgraaf en op klantendoorverwijzingen tussen merken", libs:["numpy"]},
-          {code:"3C", title:"EOQ", path:"Deel 3 - toepassingen/3C-EOQ.ipynb", subject:"Economic Order Quantity in voorraadbeheer: bestel- en voorraadkosten berekenen en optimaliseren met NumPy-matrices", libs:["numpy","matplotlib"]},
-          {code:"3D", title:"Prijsvoorspellingen en investeren", path:"Deel 3 - toepassingen/3D-prijs_voorspelling.ipynb", subject:"Beleggingsstrategie op AAPL-koersdata (tijdreeksen, uitsluitend ter illustratie)", libs:["numpy","pandas","matplotlib"]},
-          {code:"3F", title:"Project planning (CPM/PERT)", path:"Deel 3 - toepassingen/3F-project_planning.ipynb", subject:"Projectplanning als afhankelijkheidsgraaf: earliest/latest start-finish tijden, slack en het kritieke pad berekenen via recursie, met Gantt-grafiek", libs:["numpy","pandas","matplotlib","networkx"]},
-        ],
-        exercises: [
-          {code:"3B", title:"PageRank — oefening", notebook:"Deel 3 - toepassingen/3-oefeningen.ipynb",
-           desc:"Twee implementaties van PageRank naast elkaar: matrix-gebaseerd met NumPy (met dangling nodes en convergentiecheck) en dictionary-gebaseerd op een graaf van paginalinks.", covers:["3B PageRank"], libs:["numpy"]},
-        ]
-      }
+
+  "2": {
+    label: "Deel 2", name: "Algoritmes",
+    intro: "Zoeken, recursie en backtracking, sorteren en complexiteit.",
+    slideExercises: [],
+    steps: [
+      {title:"Zoeken en soorten algoritmes", blurb:"Efficiënt zoeken, vroegtijdig stoppen en verschillende algoritmische strategieën.", items:[
+        {code:"2A.0", title:"Voorbeeld: 24-urenloop", path:"Deel 2 - algoritmes/2A.0-voorbeeld_24urenloop.ipynb", subject:"Monte Carlo-simulatie van een 24-uursestafette tussen vier studententeams: rondetijden simuleren, races draaien, resultaten samenvatten en plotten", libs:["numpy","pandas","matplotlib","json","os","typing"]},
+        {code:"2A.1", title:"Zoekfuncties", path:"Deel 2 - algoritmes/2A.1-zoekfuncties.ipynb", subject:"De laagste getallen in een lijst zoeken, omgaan met grensgevallen", libs:[]},
+        {code:"2A.2", title:"Bewijs van het tegendeel", path:"Deel 2 - algoritmes/2A.2-bewijs_tegendeel.ipynb", subject:"Vroegtijdig stoppen: symmetrie van een matrix, gesorteerde rij, identieke rijen controleren", libs:[]},
+        {code:"2A.3", title:"Soorten algoritmes (zoekstrategieën)", path:"Deel 2 - algoritmes/2A.3-soorten_algoritmes.ipynb", subject:"Gulzige (greedy) en benaderingsalgoritmes (fractionele knapsack), probabilistische algoritmes (Monte Carlo) en iteratieve verbetering (lokale zoeker, hill climbing, o.a. voor de winst van een advertentiemix)", libs:["numpy","pandas"]},
+        {code:"2.A", title:"Voorbeeld examenvragen", kind:"examen",
+         opgave:"Deel 2 - algoritmes/Oefeningen/2.A-voorbeeld_examenvragen-opgave.ipynb", oplossing:"Deel 2 - algoritmes/Oefeningen/2.A-voorbeeld_examenvragen-oplossing.ipynb",
+         desc:"Opgave 1: de rij met de hoogste som in een matrix zoeken met vroegtijdig stoppen (bewijs van het tegendeel), met zelftests (assert). Opgave 2: de verkorte 24-urenloop-code uitbreiden met een extra team ('Pedal') en met vermoeidheid in de simulatie.",
+         covers:["2A.0 Voorbeeld: 24-urenloop","2A.1 Zoekfuncties","2A.2 Bewijs van het tegendeel"], libs:["numpy","pandas","typing"]},
+      ]},
+      {title:"Recursie", blurb:"Een probleem oplossen door het op te splitsen in kleinere versies van zichzelf.", items:[
+        {code:"2B.1", title:"Recursie", path:"Deel 2 - algoritmes/2B.1-recursie.ipynb", subject:"Faculteit, som van een lijst, het maximum bepalen en de rij van Fibonacci (met tijdmeting)", libs:["time"]},
+        {code:"2B.1", title:"Voorbeelden", path:"Deel 2 - algoritmes/2B.1-voorbeelden.ipynb", subject:"Drie uitgewerkte voorbeelden: aftellen tot 0, de som van een reeks door ze telkens in twee te splitsen en een getal zoeken met een recursieve binaire zoekboom", libs:[]},
+        {code:"2.B1", title:"Oefeningen", kind:"oefening",
+         opgave:"Deel 2 - algoritmes/Oefeningen/2.B1-oefeningen-opgave.ipynb", oplossing:"Deel 2 - algoritmes/Oefeningen/2.B1-oefeningen-oplossing.ipynb",
+         desc:"Zelf de recursieve functies invullen bij dezelfde drie voorbeelden: tel_af (aftellen), som_reeksen (reeks halveren en optellen) en vind_getal (binair zoeken met True/False).",
+         covers:["2B.1 Recursie","2B.1 Voorbeelden"], libs:[]},
+      ]},
+      {title:"Backtracking", blurb:"Recursief alle mogelijkheden uitproberen en bij een dood punt een stap terugzetten.", items:[
+        {code:"2B.2", title:"Backtracking", path:"Deel 2 - algoritmes/2B.2-backtracking.ipynb", subject:"Recursieve backtracking via een zoekboom: paardensprong op een schaakbord (Knight's tour) en Sudoku oplossen", libs:[]},
+        {code:"2B.2", title:"Voorbeeld: Dammen", path:"Deel 2 - algoritmes/2B.2-voorbeeld_dammen.ipynb", subject:"Backtracking op een dammenbord, in 3 stappen opgebouwd: zorgeloze recursie, stap-controle toevoegen en stapnummers zetten (met hulpfuncties om het bord te printen en te kopiëren)", libs:[]},
+        {code:"2B.2", title:"Voorbeeld: Doolhof", path:"Deel 2 - algoritmes/2B.2-voorbeeld_doolhof.ipynb", subject:"Recursief een uitweg uit een doolhof vinden vanaf een startpositie (via de vier richtingen), met bijhouden van het pad en de recursiediepte; inclusief asserts", libs:[]},
+        {code:"2B.2", title:"Backtracking — lees, voorspel, verbeter", kind:"debug",
+         opgave:"Deel 2 - algoritmes/Oefeningen/2B.2-backtracking-debug-opgave.ipynb", oplossing:"Deel 2 - algoritmes/Oefeningen/2B.2-backtracking-debug-oplossing.ipynb",
+         desc:"4 debug-fragmenten rond backtracking in een doolhof: vergeten backtracken (pop), de return-waarde van de recursieve oproep niet gebruiken, een foute grenscontrole (<= i.p.v. <) en vergeten controleren of een vakje al bezocht is.",
+         covers:["2B.2 Backtracking","2B.2 Voorbeeld: Doolhof"], libs:[]},
+      ]},
+      {title:"Sorteren en complexiteit", blurb:"Sorteeralgoritmes en hoe je hun snelheid meet.", noExercises:true, items:[
+        {code:"2C.1", title:"Sorteren", path:"Deel 2 - algoritmes/2C.1-sorteren.ipynb", subject:"Bubble sort en merge sort (met pseudocode en implementatie)", libs:[]},
+        {code:"2C.2", title:"Complexiteit", path:"Deel 2 - algoritmes/2C.2-complexiteit.ipynb", subject:"Big-O empirisch aangetoond door looptijden van bubble sort vs. merge sort te meten", libs:["numpy","matplotlib","time"]},
+      ]},
+    ]
+  },
+
+  "3": {
+    label: "Deel 3", name: "Toepassingen",
+    intro: "Algoritmes in de praktijk: taalmodellen, PageRank, voorraadbeheer, prijsvoorspelling en projectplanning.",
+    slideExercises: [],
+    steps: [
+      {title:"Algoritmes achter AI en het web", blurb:"Hoe een taalmodel werkt en hoe Google pagina's rangschikt.", items:[
+        {code:"3A", title:"Een language model gebouwd in NumPy", path:"Deel 3 - toepassingen/3A-mini-LLM-in_numpy.ipynb", subject:"Klein taalmodel op basis van de Transformer-architectuur, volledig in NumPy (tokenisatie, attention, softmax, training)", libs:["numpy"]},
+        {code:"3B", title:"PageRank", path:"Deel 3 - toepassingen/3B-PageRank.ipynb", subject:"Het PageRank-algoritme (Google) toegepast op een webgraaf en op klantendoorverwijzingen tussen merken", libs:["numpy"]},
+        {code:"3B", title:"PageRank — oefening", kind:"oefening",
+         notebook:"Deel 3 - toepassingen/3-oefeningen.ipynb",
+         desc:"Twee implementaties van PageRank naast elkaar: matrix-gebaseerd met NumPy (met dangling nodes en convergentiecheck) en dictionary-gebaseerd op een graaf van paginalinks.",
+         covers:["3B PageRank"], libs:["numpy"]},
+      ]},
+      {title:"Bedrijfstoepassingen", blurb:"Optimaliseren, voorspellen en plannen met dezelfde bouwstenen.", items:[
+        {code:"3C", title:"EOQ", path:"Deel 3 - toepassingen/3C-EOQ.ipynb", subject:"Economic Order Quantity in voorraadbeheer: bestel- en voorraadkosten berekenen en optimaliseren met NumPy-matrices", libs:["numpy","matplotlib"]},
+        {code:"3D", title:"Prijsvoorspellingen en investeren", path:"Deel 3 - toepassingen/3D-prijs_voorspelling.ipynb", subject:"Beleggingsstrategie op AAPL-koersdata (tijdreeksen, uitsluitend ter illustratie)", libs:["numpy","pandas","matplotlib"]},
+        {code:"3F", title:"Project planning (CPM/PERT)", path:"Deel 3 - toepassingen/3F-project_planning.ipynb", subject:"Projectplanning als afhankelijkheidsgraaf: earliest/latest start-finish tijden, slack en het kritieke pad berekenen via recursie, met Gantt-grafiek", libs:["numpy","pandas","matplotlib","networkx"]},
+      ]},
     ]
   }
 };
+const DEEL_ORDER = ["1A", "1B", "2", "3"];
 
 /* ================= SETTINGS =================
    No path, no token, no interface picker: every link opens the classic
@@ -413,99 +598,161 @@ function refreshAllLinks() {
   });
 }
 
+
 /* ================= RENDER ================= */
+const KIND_LABEL = {
+  slides: "Bij de slides",
+  debug: "Lees · voorspel · verbeter",
+  examen: "Examenstijl",
+  oefening: "Oefening",
+};
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function isExercise(it) { return !it.path; }
+
 function libChips(libs) {
   if (!libs || !libs.length) return '';
-  return `<div class="chips">${libs.map(l => `<span class="chip lib">${l}</span>`).join('')}</div>`;
+  return `<div class="chips">${libs.map(l => `<span class="chip lib">${esc(l)}</span>`).join('')}</div>`;
 }
 
 function coversChips(covers) {
   if (!covers || !covers.length) return '';
-  return `<div class="covers"><span class="label">Dekt:</span>${covers.map(c => `<span class="chip">${c}</span>`).join(' ')}</div>`;
+  return `<div class="covers"><span class="label">Dekt:</span>${covers.map(c => `<span class="chip">${esc(c)}</span>`).join('')}</div>`;
 }
 
-function renderTopicCard(t) {
-  return `
-  <div class="card" data-searchpaths="${t.path}">
-    <span class="code">${t.code}</span>
-    <a class="opentitle" data-relpath="${t.path}" href="#">${t.title}</a>
-    <div class="subject">${t.subject}</div>
-    ${libChips(t.libs)}
+function crumbHtml(crumb) {
+  return crumb ? `<div class="crumb">${esc(crumb)}</div>` : '';
+}
+
+function renderTopic(t, crumb) {
+  return `${crumbHtml(crumb)}
+  <div class="topic">
+    <span class="code">${esc(t.code)}</span>
+    <div>
+      <a class="opentitle" data-relpath="${t.path}" href="#">${esc(t.title)}</a>
+      <div class="subject">${esc(t.subject)}</div>
+      ${libChips(t.libs)}
+    </div>
   </div>`;
 }
 
-function renderExercise(e) {
+function renderExercise(e, crumb) {
   const buttons = e.notebook
-    ? `<div class="buttons"><a class="opgave" data-relpath="${e.notebook}" href="#">Open notebook</a></div>`
-    : `
-    <div class="buttons">
-      ${e.opgave ? `<a class="opgave" data-relpath="${e.opgave}" href="#">Opgave</a>` : `<span class="no-oplossing">geen opgave beschikbaar</span>`}
-      ${e.oplossing ? `<a class="oplossing" data-relpath="${e.oplossing}" href="#">Oplossing</a>` : `<span class="no-oplossing">geen oplossing beschikbaar</span>`}
-    </div>`;
-  const searchpaths = [e.opgave, e.oplossing, e.notebook].filter(Boolean).join(',');
-  return `
-  <div class="exercise" data-searchpaths="${searchpaths}">
-    <div class="top-row">
-      <span class="code">${e.code}</span>
-      <span class="title">${e.title}</span>
+    ? `<a class="btn-opgave" data-relpath="${e.notebook}" href="#">Open notebook →</a>`
+    : `${e.opgave ? `<a class="btn-opgave" data-relpath="${e.opgave}" href="#">Open de opgave →</a>` : `<span class="no-oplossing">geen opgave beschikbaar</span>`}
+       ${e.oplossing ? `<a class="btn-oplossing" data-relpath="${e.oplossing}" href="#">Bekijk de oplossing</a>` : `<span class="no-oplossing">geen oplossing beschikbaar</span>`}`;
+  return `${crumbHtml(crumb)}
+  <div class="exercise">
+    <div class="ex-top">
+      <span class="ex-badge">✏️ Oefening</span>
+      <span class="ex-kind">${esc(KIND_LABEL[e.kind] || '')}</span>
+      <span class="ex-code">${esc(e.code)}</span>
     </div>
-    <div class="desc">${e.desc}</div>
+    <div class="ex-title">${esc(e.title)}</div>
+    <div class="desc">${esc(e.desc)}</div>
     ${coversChips(e.covers)}
     ${libChips(e.libs)}
-    ${buttons}
+    <div class="btns">${buttons}</div>
   </div>`;
 }
 
-function renderGroup(g) {
-  const prefix = g.label ? `${g.label} — ` : '';
-  const slideSection = (g.slideExercises && g.slideExercises.length) ? `
-  <section class="group">
-    <h2>${prefix}Oefeningen op de slides</h2>
-    ${g.slideExercises.map(renderExercise).join('')}
-  </section>` : '';
-  return `${slideSection}
-  <section class="group">
-    <h2>${prefix}Cursusmateriaal</h2>
-    <div class="grid">${g.topics.map(renderTopicCard).join('')}</div>
-  </section>
-  <section class="group">
-    <h2>${prefix}Oefeningen</h2>
-    ${g.exercises.length ? g.exercises.map(renderExercise).join('') : '<div class="empty-msg">Nog geen oefeningen beschikbaar voor dit deel.</div>'}
-  </section>`;
+function renderItem(it, crumb) {
+  return isExercise(it) ? renderExercise(it, crumb) : renderTopic(it, crumb);
 }
 
-function renderDeel(num) {
-  return DATA[num].groups.map(renderGroup).join('');
+function plural(n, een, meer) { return `${n} ${n === 1 ? een : meer}`; }
+
+function renderStep(step, idx) {
+  const nTopics = step.items.filter(i => !isExercise(i)).length;
+  const nEx = step.items.length - nTopics;
+  const meta = [plural(nTopics, 'notebook', 'notebooks')];
+  if (nEx) meta.push(plural(nEx, 'oefening', 'oefeningen'));
+  return `
+  <details class="step" open>
+    <summary class="step-head">
+      <span class="step-num">${idx + 1}</span>
+      <span class="step-text">
+        <span class="step-title">${esc(step.title)}</span>
+        ${step.blurb ? `<span class="step-blurb">${esc(step.blurb)}</span>` : ''}
+      </span>
+      <span class="step-meta">${meta.join(' · ')}</span>
+    </summary>
+    <div class="step-body">
+      ${step.items.map(it => renderItem(it)).join('')}
+      ${step.noExercises ? '<div class="no-ex">Nog geen aparte oefeningen voor dit onderdeel.</div>' : ''}
+    </div>
+  </details>`;
+}
+
+function renderDeel(key) {
+  const d = DATA[key];
+  const nTopics = d.steps.reduce((n, s) => n + s.items.filter(i => !isExercise(i)).length, 0);
+  const nEx = d.steps.reduce((n, s) => n + s.items.filter(isExercise).length, 0) + d.slideExercises.length;
+  const slides = d.slideExercises.length ? `
+  <section class="slides-box">
+    <h3 class="box-title">Tijdens de les</h3>
+    ${d.slideExercises.map(e => renderExercise(e)).join('')}
+  </section>` : '';
+  return `
+  <div class="deel-head">
+    <h2>${esc(d.label)} — ${esc(d.name)}</h2>
+    <p>${esc(d.intro)}</p>
+    <div class="stats">
+      <span class="stat">${plural(d.steps.length, 'stap', 'stappen')}</span>
+      <span class="stat">${plural(nTopics, 'notebook', 'notebooks')}</span>
+      <span class="stat ex">${plural(nEx, 'oefening', 'oefeningen')}</span>
+    </div>
+  </div>
+  ${slides}
+  <div class="route">${d.steps.map(renderStep).join('')}</div>`;
 }
 
 function renderAll() {
-  const main = document.getElementById('main');
-  main.innerHTML = [1,2,3].map(n => `<div class="deel${n===1?' active':''}" id="deel${n}">${renderDeel(n)}</div>`).join('');
+  document.getElementById('tabs').innerHTML = DEEL_ORDER.map(k =>
+    `<button class="tab" type="button" data-key="${k}"><span class="t-main">${esc(DATA[k].label)}</span><span class="t-sub">${esc(DATA[k].name)}</span></button>`
+  ).join('');
+  document.getElementById('main').innerHTML = DEEL_ORDER.map(k =>
+    `<div class="deel" id="deel-${k}">${renderDeel(k)}</div>`
+  ).join('');
   refreshAllLinks();
 }
 
 /* ================= TABS ================= */
-function setupTabs() {
-  const tabs = document.querySelectorAll('.tab');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.deel').forEach(d => d.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById(tab.dataset.target).classList.add('active');
-    });
-  });
+function activateDeel(key, updateHash) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.key === key));
+  document.querySelectorAll('.deel').forEach(d => d.classList.toggle('active', d.id === 'deel-' + key));
+  if (updateHash) { try { history.replaceState(null, '', '#deel-' + key); } catch (e) { /* file:// kan dit weigeren */ } }
 }
 
-/* ================= SEARCH (identical to index.html) ================= */
+function setupTabs() {
+  const m = location.hash.match(/^#deel-(.+)$/);
+  const wanted = m ? decodeURIComponent(m[1]) : '';
+  activateDeel(DATA[wanted] ? wanted : DEEL_ORDER[0], false);
+  document.querySelectorAll('.tab').forEach(tab =>
+    tab.addEventListener('click', () => activateDeel(tab.dataset.key, true)));
+}
+
+/* ================= SEARCH ================= */
+/* SEARCH_INDEX (uit search-index.js) koppelt het pad van een notebook aan {term: tfidf-gewicht},
+   offline berekend uit de echte inhoud van de notebooks — zie build_search_index.py.
+   Zo vindt zoeken ook wat *in* een notebook staat (functienamen, bibliotheken, datasets, ...),
+   niet enkel de korte samenvatting die op de pagina staat. Tijdens het zoeken vervangt een platte
+   resultatenlijst de route; zonder zoekterm is de route weer zichtbaar. */
 function tokenizeQuery(q) {
   return (q.toLowerCase().match(/[a-zà-ÿ0-9_]{3,}/gi) || []);
 }
 
-function tfidfScore(searchpaths, queryTerms) {
-  if (!searchpaths || typeof SEARCH_INDEX === 'undefined' || !queryTerms.length) return 0;
+function itemPaths(it) {
+  return [it.path, it.opgave, it.oplossing, it.notebook].filter(Boolean);
+}
+
+function tfidfScore(it, queryTerms) {
+  if (typeof SEARCH_INDEX === 'undefined' || !queryTerms.length) return 0;
   let score = 0;
-  searchpaths.split(',').forEach(rp => {
+  itemPaths(it).forEach(rp => {
     const doc = SEARCH_INDEX[rp];
     if (!doc) return;
     queryTerms.forEach(t => { if (doc[t]) score += doc[t]; });
@@ -515,55 +762,43 @@ function tfidfScore(searchpaths, queryTerms) {
 
 function setupSearch() {
   const search = document.getElementById('search');
-  const tabs = document.querySelectorAll('.tab');
+  const tabbar = document.getElementById('tabbar');
+  const main = document.getElementById('main');
+  const results = document.getElementById('results');
 
-  const grids = Array.from(document.querySelectorAll('.grid'));
-  const originalCardOrder = grids.map(g => Array.from(g.children));
-  const exerciseSections = Array.from(document.querySelectorAll('section.group')).filter(s => s.querySelector('.exercise'));
-  const originalExerciseOrder = exerciseSections.map(s => Array.from(s.querySelectorAll('.exercise')));
-
-  function restoreOriginalOrder() {
-    grids.forEach((g, i) => originalCardOrder[i].forEach(el => g.appendChild(el)));
-    exerciseSections.forEach((s, i) => originalExerciseOrder[i].forEach(el => s.appendChild(el)));
-  }
-
-  function scoreOf(el, q, queryTerms) {
-    const textMatch = el.textContent.toLowerCase().includes(q);
-    const rel = tfidfScore(el.dataset.searchpaths, queryTerms);
-    return { match: textMatch || rel > 0, score: rel + (textMatch ? 50 : 0) };
-  }
-
-  function rankAndFilter(container, selector, q, queryTerms) {
-    const scored = Array.from(container.querySelectorAll(selector)).map(el => ({ el, ...scoreOf(el, q, queryTerms) }));
-    scored.forEach(({ el, match }) => el.classList.toggle('hidden', !match));
-    scored.sort((a, b) => b.score - a.score).forEach(({ el }) => container.appendChild(el));
-  }
+  const ALL = [];
+  DEEL_ORDER.forEach(k => {
+    const d = DATA[k];
+    const add = (it, crumb) => ALL.push({
+      it, crumb,
+      hay: [it.code, it.title, it.subject || it.desc || '', (it.covers || []).join(' '), (it.libs || []).join(' '), d.label, d.name, crumb].join(' ').toLowerCase(),
+    });
+    d.slideExercises.forEach(it => add(it, `${d.label} · ${d.name} — tijdens de les`));
+    d.steps.forEach((s, i) => s.items.forEach(it => add(it, `${d.label} · ${d.name} — stap ${i + 1}: ${s.title}`)));
+  });
 
   search.addEventListener('input', () => {
-    const raw = search.value.trim();
-    const q = raw.toLowerCase();
-    const allDeels = document.querySelectorAll('.deel');
-
+    const q = search.value.trim().toLowerCase();
     if (q === '') {
-      document.querySelectorAll('.card, .exercise, section.group').forEach(el => el.classList.remove('hidden'));
-      restoreOriginalOrder();
-      allDeels.forEach(d => d.classList.remove('active'));
-      tabs.forEach(t => t.classList.remove('active'));
-      tabs[0].classList.add('active');
-      allDeels[0].classList.add('active');
+      results.hidden = true; results.innerHTML = '';
+      tabbar.hidden = false; main.hidden = false;
       return;
     }
+    const terms = tokenizeQuery(q);
+    const hits = ALL.map(r => {
+      const text = r.hay.includes(q);
+      const rel = tfidfScore(r.it, terms);
+      return { r, match: text || rel > 0, score: rel + (text ? 50 : 0) };
+    }).filter(x => x.match).sort((a, b) => b.score - a.score);
 
-    allDeels.forEach(d => d.classList.add('active'));
-    const queryTerms = tokenizeQuery(q);
-
-    grids.forEach(g => rankAndFilter(g, '.card', q, queryTerms));
-    exerciseSections.forEach(s => rankAndFilter(s, '.exercise', q, queryTerms));
-
-    document.querySelectorAll('section.group').forEach(group => {
-      const visible = group.querySelectorAll('.card:not(.hidden), .exercise:not(.hidden)').length;
-      group.classList.toggle('hidden', visible === 0);
-    });
+    tabbar.hidden = true; main.hidden = true; results.hidden = false;
+    results.innerHTML = hits.length
+      ? `<div class="results-head">${plural(hits.length, 'resultaat', 'resultaten')} voor “${esc(search.value.trim())}”</div>` + hits.map(h => renderItem(h.r.it, h.r.crumb)).join('')
+      : `<div class="empty-msg">Niets gevonden voor “${esc(search.value.trim())}”.</div>`;
+    refreshAllLinks();
+  });
+  search.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { search.value = ''; search.dispatchEvent(new Event('input')); }
   });
 }
 
@@ -578,10 +813,12 @@ function setupLitePanel() {
   });
 }
 
+
 renderAll();
 setupTabs();
 setupSearch();
 setupLitePanel();
+
 </script>
 
 </body>
