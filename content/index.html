@@ -328,6 +328,13 @@
   a.btn-oplossing:hover { background: var(--ex); color: var(--ex-on); }
   .no-oplossing { font-size: 0.8rem; color: var(--muted); font-style: italic; }
 
+  /* ---- databestanden ---- */
+  .datafiles { font-size: 0.8rem; color: var(--muted); display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; margin-top: 0.35rem; }
+  .datafiles .label { margin-right: 0.1rem; }
+  a.datalink { text-decoration: none; background: var(--chip); color: var(--chip-text); padding: 0.1rem 0.55rem; border-radius: 3px; border: 1px solid var(--border); }
+  a.datalink:hover { border-color: var(--accent); color: var(--accent); }
+  a.datalink .size { color: var(--muted); font-size: 0.72rem; }
+
   /* ---- zoekresultaten ---- */
   .results-head { font-size: 0.9rem; color: var(--muted); margin: 0 0 0.4rem; }
   .crumb { font-size: 0.74rem; color: var(--muted); margin: 1rem 0 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -514,6 +521,10 @@ const DATA = {
          opgave:"Deel 2 - algoritmes/Oefeningen/2.B1-oefeningen-opgave.ipynb", oplossing:"Deel 2 - algoritmes/Oefeningen/2.B1-oefeningen-oplossing.ipynb",
          desc:"Zelf de recursieve functies invullen bij dezelfde drie voorbeelden: tel_af (aftellen), som_reeksen (reeks halveren en optellen) en vind_getal (binair zoeken met True/False).",
          covers:["2B.1 Recursie","2B.1 Voorbeelden"], libs:[]},
+        {code:"2.B1", title:"Voorbeeld examenvragen", kind:"examen",
+         opgave:"Deel 2 - algoritmes/Oefeningen/2.B1-voorbeeld_examenvragen-opgave.ipynb", oplossing:"Deel 2 - algoritmes/Oefeningen/2.B1-voorbeeld_examenvragen-oplossing.ipynb",
+         desc:"Opgave 1: alle paden van linksboven naar rechtsonder in een matrix van 1-en en 0-en tellen met recursie (vind_paden), met zelftests (assert). Opgave 2: de omzetlijst van een webshop recursief verwerken: dagen boven een doel tellen (lineaire recursie), de beste verkoopdag zoeken door de lijst te halveren en de complexiteit bespreken.",
+         covers:["2B.1 Recursie","2B.1 Voorbeelden"], libs:["numpy"]},
       ]},
       {title:"Backtracking", blurb:"Recursief alle mogelijkheden uitproberen en bij een dood punt een stap terugzetten.", items:[
         {code:"2B.2", title:"Backtracking", path:"Deel 2 - algoritmes/2B.2-backtracking.ipynb", subject:"Recursieve backtracking via een zoekboom: paardensprong op een schaakbord (Knight's tour) en Sudoku oplossen", libs:[]},
@@ -522,6 +533,10 @@ const DATA = {
         {code:"2B.2", title:"Backtracking — lees, voorspel, verbeter", kind:"debug",
          opgave:"Deel 2 - algoritmes/Oefeningen/2B.2-backtracking-debug-opgave.ipynb", oplossing:"Deel 2 - algoritmes/Oefeningen/2B.2-backtracking-debug-oplossing.ipynb",
          desc:"4 debug-fragmenten rond backtracking in een doolhof: vergeten backtracken (pop), de return-waarde van de recursieve oproep niet gebruiken, een foute grenscontrole (<= i.p.v. <) en vergeten controleren of een vakje al bezocht is.",
+         covers:["2B.2 Backtracking","2B.2 Voorbeeld: Doolhof"], libs:[]},
+        {code:"2.B2", title:"Voorbeeld examenvragen", kind:"examen",
+         opgave:"Deel 2 - algoritmes/Oefeningen/2.B2-voorbeeld_examenvragen-opgave.ipynb", oplossing:"Deel 2 - algoritmes/Oefeningen/2.B2-voorbeeld_examenvragen-oplossing.ipynb",
+         desc:"Opgave 1: een rooster van beleggingsadviseurs en sectoren aanvullen met backtracking (controleer en het recursieve los_op, met backtrack-stap). Opgave 4: uit een lijst openstaande facturen de combinatie zoeken die precies een overgeschreven bedrag vormt (zoek_facturen).",
          covers:["2B.2 Backtracking","2B.2 Voorbeeld: Doolhof"], libs:[]},
       ]},
       {title:"Sorteren en complexiteit", blurb:"Sorteeralgoritmes en hoe je hun snelheid meet.", noExercises:true, items:[
@@ -533,26 +548,32 @@ const DATA = {
 
   "3": {
     label: "Deel 3", name: "Toepassingen",
-    intro: "Algoritmes in de praktijk: taalmodellen, PageRank, voorraadbeheer, prijsvoorspelling en projectplanning.",
+    intro: "Algoritmes in de praktijk: taalmodellen, PageRank, voorraadbeheer en prijsvoorspelling.",
     slideExercises: [],
     steps: [
       {title:"Algoritmes achter AI en het web", blurb:"Hoe een taalmodel werkt en hoe Google pagina's rangschikt.", items:[
         {code:"3A", title:"Een language model gebouwd in NumPy", path:"Deel 3 - toepassingen/3A-mini-LLM-in_numpy.ipynb", subject:"Klein taalmodel op basis van de Transformer-architectuur, volledig in NumPy (tokenisatie, attention, softmax, training)", libs:["numpy"]},
         {code:"3B", title:"PageRank", path:"Deel 3 - toepassingen/3B-PageRank.ipynb", subject:"Het PageRank-algoritme (Google) toegepast op een webgraaf en op klantendoorverwijzingen tussen merken", libs:["numpy"]},
-        {code:"3B", title:"PageRank — oefening", kind:"oefening",
-         notebook:"Deel 3 - toepassingen/3-oefeningen.ipynb",
-         desc:"Twee implementaties van PageRank naast elkaar: matrix-gebaseerd met NumPy (met dangling nodes en convergentiecheck) en dictionary-gebaseerd op een graaf van paginalinks.",
-         covers:["3B PageRank"], libs:["numpy"]},
       ]},
       {title:"Bedrijfstoepassingen", blurb:"Optimaliseren, voorspellen en plannen met dezelfde bouwstenen.", items:[
         {code:"3C", title:"EOQ", path:"Deel 3 - toepassingen/3C-EOQ.ipynb", subject:"Economic Order Quantity in voorraadbeheer: bestel- en voorraadkosten berekenen en optimaliseren met NumPy-matrices", libs:["numpy","matplotlib"]},
         {code:"3D", title:"Prijsvoorspellingen en investeren", path:"Deel 3 - toepassingen/3D-prijs_voorspelling.ipynb", subject:"Beleggingsstrategie op AAPL-koersdata (tijdreeksen, uitsluitend ter illustratie)", libs:["numpy","pandas","matplotlib"]},
-        {code:"3F", title:"Project planning (CPM/PERT)", path:"Deel 3 - toepassingen/3F-project_planning.ipynb", subject:"Projectplanning als afhankelijkheidsgraaf: earliest/latest start-finish tijden, slack en het kritieke pad berekenen via recursie, met Gantt-grafiek", libs:["numpy","pandas","matplotlib","networkx"]},
       ]},
     ]
   }
 };
 const DEEL_ORDER = ["1A", "1B", "2", "3"];
+/* Databestanden die een notebook inlaadt (automatisch bepaald uit de notebooks): [pad, grootte in bytes]. */
+const DATA_FILES = {
+  "Deel 1 - syntax/Deel B/1B.3-pandas-data.ipynb": [["Deel 1 - syntax/Deel B/COVID19BE_CASES_AGESEX.csv", 3336201]],
+  "Deel 1 - syntax/Deel B/1B.4-pandas-cases.ipynb": [["Deel 1 - syntax/Deel B/COVID19BE_CASES_AGESEX.csv", 3336201]],
+  "Deel 1 - syntax/Deel B/Oefeningen/1B.2-start_oefeningen_deel1-opgave.ipynb": [["Deel 1 - syntax/Deel B/Oefeningen/TF_ACCIDENTS_2020.csv", 5041509]],
+  "Deel 1 - syntax/Deel B/Oefeningen/1B.2-start_oefeningen_deel1-oplossing.ipynb": [["Deel 1 - syntax/Deel B/Oefeningen/TF_ACCIDENTS_2020.csv", 5041509]],
+  "Deel 1 - syntax/Deel B/Oefeningen/1B.2-voorbeeld_examenvragen-debug-opgave.ipynb": [["Deel 1 - syntax/Deel B/Oefeningen/heart_disease_data.csv", 35921]],
+  "Deel 1 - syntax/Deel B/Oefeningen/1B.2-voorbeeld_examenvragen-debug-oplossing.ipynb": [["Deel 1 - syntax/Deel B/Oefeningen/heart_disease_data.csv", 35921]],
+  "Deel 3 - toepassingen/3A-mini-LLM-in_numpy.ipynb": [["Deel 3 - toepassingen/LOTR1.txt", 210099]],
+  "Deel 3 - toepassingen/3D-prijs_voorspelling.ipynb": [["Deel 3 - toepassingen/stock_df.csv", 178403]],
+};
 
 /* ================= SETTINGS =================
    No path, no token, no interface picker: every link opens the classic
@@ -582,19 +603,25 @@ function encodePath(relpath) {
    depends on which of the two copies is currently being viewed. Detect it
    from the URL instead of hardcoding one location. If you host this page
    somewhere else entirely, set the base URL in "Geavanceerd" instead. */
-function buildHref(relpath) {
+function buildHref(relpath, isData) {
   if (!relpath) return null;
   const base = settings.baseUrl.trim();
   const prefix = base
     ? base.replace(/\/$/, '') + '/'
     : (/\/files\/[^/]*$/.test(location.pathname) ? '../' : '');
+  if (isData) {
+    /* databestanden staan als gewone bestanden in de JupyterLite-contents: .../files/<pad> */
+    if (base) return base.replace(/\/$/, '') + '/files/' + encodePath(relpath);
+    return (/\/files\/[^/]*$/.test(location.pathname) ? '' : 'files/') + encodePath(relpath);
+  }
   return prefix + 'notebooks/index.html?path=' + encodePath(relpath);
 }
 
 function refreshAllLinks() {
   document.querySelectorAll('a[data-relpath]').forEach(a => {
-    a.href = buildHref(a.dataset.relpath);
+    a.href = buildHref(a.dataset.relpath, a.dataset.isdata);
     a.target = '_blank';
+    if (a.dataset.isdata) a.setAttribute('download', '');
   });
 }
 
@@ -618,6 +645,25 @@ function libChips(libs) {
   return `<div class="chips">${libs.map(l => `<span class="chip lib">${esc(l)}</span>`).join('')}</div>`;
 }
 
+function fmtSize(b) {
+  return b >= 1e6 ? (b / 1e6).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1e3)) + ' kB';
+}
+
+/* Databestanden die bij een notebook of oefening horen (opgave en oplossing samen, zonder dubbels). */
+function dataFor(it) {
+  const gezien = {}, uit = [];
+  itemPaths(it).forEach(p => (DATA_FILES[p] || []).forEach(f => { if (!gezien[f[0]]) { gezien[f[0]] = 1; uit.push(f); } }));
+  return uit;
+}
+
+function dataChips(it) {
+  const files = dataFor(it);
+  if (!files.length) return '';
+  return `<div class="datafiles"><span class="label">Data:</span>${files.map(f =>
+    `<a class="datalink" data-relpath="${f[0]}" data-isdata="1" href="#" title="${esc(f[0])}">📄 ${esc(f[0].split('/').pop())} <span class="size">${fmtSize(f[1])}</span></a>`
+  ).join('')}</div>`;
+}
+
 function coversChips(covers) {
   if (!covers || !covers.length) return '';
   return `<div class="covers"><span class="label">Dekt:</span>${covers.map(c => `<span class="chip">${esc(c)}</span>`).join('')}</div>`;
@@ -635,6 +681,7 @@ function renderTopic(t, crumb) {
       <a class="opentitle" data-relpath="${t.path}" href="#">${esc(t.title)}</a>
       <div class="subject">${esc(t.subject)}</div>
       ${libChips(t.libs)}
+      ${dataChips(t)}
     </div>
   </div>`;
 }
@@ -655,6 +702,7 @@ function renderExercise(e, crumb) {
     <div class="desc">${esc(e.desc)}</div>
     ${coversChips(e.covers)}
     ${libChips(e.libs)}
+    ${dataChips(e)}
     <div class="btns">${buttons}</div>
   </div>`;
 }
@@ -771,7 +819,7 @@ function setupSearch() {
     const d = DATA[k];
     const add = (it, crumb) => ALL.push({
       it, crumb,
-      hay: [it.code, it.title, it.subject || it.desc || '', (it.covers || []).join(' '), (it.libs || []).join(' '), d.label, d.name, crumb].join(' ').toLowerCase(),
+      hay: [it.code, it.title, it.subject || it.desc || '', (it.covers || []).join(' '), (it.libs || []).join(' '), dataFor(it).map(f => f[0].split('/').pop()).join(' '), d.label, d.name, crumb].join(' ').toLowerCase(),
     });
     d.slideExercises.forEach(it => add(it, `${d.label} · ${d.name} — tijdens de les`));
     d.steps.forEach((s, i) => s.items.forEach(it => add(it, `${d.label} · ${d.name} — stap ${i + 1}: ${s.title}`)));
