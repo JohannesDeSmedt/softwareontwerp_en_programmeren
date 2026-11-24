@@ -730,7 +730,6 @@ function renderStep(step, idx) {
     </summary>
     <div class="step-body">
       ${step.items.map(it => renderItem(it)).join('')}
-      ${step.noExercises ? '<div class="no-ex">Nog geen aparte oefeningen voor dit onderdeel.</div>' : ''}
     </div>
   </details>`;
 }
